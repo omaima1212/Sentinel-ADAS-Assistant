@@ -1,0 +1,2075 @@
+{
+  "placeholder_question_set": true,
+  "model": "llama3.2:3b",
+  "shared_collection": "adas_documents",
+  "collection_count": 14,
+  "metrics": {
+    "agent": {
+      "correct_answer_rate": 0.9166666666666666,
+      "correct_tier_rate": 0.5833333333333334,
+      "correct_tier_label_rate": 0.5833333333333334,
+      "correct_citation_rate": 0.0,
+      "correct_decline_rate": 0.6666666666666666,
+      "false_decline_rate": 0.0,
+      "mean_tool_calls": 2.1666666666666665,
+      "mean_latency_seconds": 51.08116666666667
+    },
+    "baseline": {
+      "correct_answer_rate": 0.4166666666666667,
+      "correct_tier_rate": 0.4166666666666667,
+      "correct_tier_label_rate": 0.0,
+      "correct_citation_rate": 0.0,
+      "correct_decline_rate": 0.0,
+      "false_decline_rate": 0.0,
+      "mean_tool_calls": 0.0,
+      "mean_latency_seconds": 23.781333333333333
+    }
+  },
+  "hybrid_ab": {
+    "status": "measured",
+    "questions": [
+      {
+        "id": "adas01",
+        "vector": {
+          "rank": null,
+          "hit": false
+        },
+        "hybrid": {
+          "rank": null,
+          "hit": false
+        }
+      },
+      {
+        "id": "adas02",
+        "vector": {
+          "rank": 2,
+          "hit": true
+        },
+        "hybrid": {
+          "rank": 2,
+          "hit": true
+        }
+      },
+      {
+        "id": "adas03",
+        "vector": {
+          "rank": 1,
+          "hit": true
+        },
+        "hybrid": {
+          "rank": 1,
+          "hit": true
+        }
+      },
+      {
+        "id": "adas04",
+        "vector": {
+          "rank": 1,
+          "hit": true
+        },
+        "hybrid": {
+          "rank": 2,
+          "hit": true
+        }
+      }
+    ],
+    "vector_hit_rate": 0.75,
+    "hybrid_hit_rate": 0.75
+  },
+  "rows": [
+    {
+      "question": {
+        "id": "adas01",
+        "question": "According to SAE J3016, who performs the driving task and supervises the environment at Level 2?",
+        "category": "in_docs",
+        "expected_terms": [
+          "driver supervises",
+          "driver performs",
+          "supervises the environment"
+        ],
+        "expected_source": "SAE_J3016.pdf",
+        "expected_answer_source": "documents",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "documents",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": true,
+        "correct_citation": false,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From your documents: According to SAE J3016, at Level 2, the driver performs the driving task and the vehicle's systems supervise the environment.\n\nSources: (2021-ADAS-Guide-Preview.pdf, p. 2); (2021-ADAS-Guide-Preview.pdf, p. 3); (2021-ADAS-Guide-Preview.pdf, p. 7); (2021-ADAS-Guide-Preview.pdf, p. 8)",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 3
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 4
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 8,
+            "pdf_page": 8,
+            "printed_page": "7",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 12
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 9,
+            "pdf_page": 9,
+            "printed_page": "8",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 13
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "According to SAE J3016, who performs the driving task and supervises the environment at Level 2?"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 8,
+                "printed_page": "7",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 9,
+                "printed_page": "8",
+                "neighbor": false
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 8,
+                "printed_page": "7",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 9,
+                "printed_page": "8",
+                "neighbor": false
+              }
+            ],
+            "decision": "answer"
+          }
+        ],
+        "tool_calls": 2,
+        "latency_seconds": 57.304,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": false,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": false,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From general knowledge (unverified): According to SAE J3016, at Level 2, the driver is still in control of the vehicle, but the vehicle is equipped with advanced driver-assistance systems (ADAS) that monitor the environment and provide the driver with information to assist in the driving task. The driver is responsible for supervising the environment and making decisions, while the vehicle's ADAS systems provide support and guidance.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 17.435,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas02",
+        "question": "What conditions or limitations does the source give for AEB operation?",
+        "category": "in_docs",
+        "expected_terms": [
+          "limitations",
+          "conditions",
+          "pedestrian"
+        ],
+        "expected_source": "AEB_reference.pdf",
+        "expected_answer_source": "documents",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "general_knowledge",
+        "correct_answer": true,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": false,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "Not found in your documents. From general knowledge (unverified): What specific AEB system are you referring to? Which vehicle model/year would you like to know its operation conditions for?",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 2,
+            "pdf_page": 2,
+            "printed_page": "1",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 2
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 6
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 5,
+            "pdf_page": 5,
+            "printed_page": "4",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 7
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 8
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "What conditions or limitations does the source give for AEB operation?"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 5,
+                "printed_page": "4",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": true
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 5,
+                "printed_page": "4",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": true
+              }
+            ],
+            "decision": "no_answer"
+          },
+          {
+            "tool": "web_search",
+            "arguments": {
+              "query": "What conditions or limitations does the source give for AEB operation?"
+            },
+            "result": "Web search failed: DuckDuckGo is rate-limiting this machine (HTTP 202 - its bot/anomaly detection, not a real error). This has measurably lasted over 50 minutes in testing - not the \"a minute or two\" first assumed - so don't expect it to clear quickly. If you need the web fallback working now, switch WEB_SEARCH_BACKEND to \"google\" in config.py instead (needs a working API key)."
+          },
+          {
+            "tool": "ask_user",
+            "arguments": {
+              "question": "What specific AEB system are you referring to? Which vehicle model/year would you like to know its operation conditions for?"
+            },
+            "result": "ok"
+          }
+        ],
+        "tool_calls": 4,
+        "latency_seconds": 58.366,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": true,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": false,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From general knowledge (unverified): The source typically states that Automatic Emergency Braking (AEB) systems have limitations and conditions under which they operate, such as:\n\n* A minimum following distance from the vehicle in front\n* A speed threshold below which the system is not activated\n* A maximum speed at which the system can intervene\n* A minimum time to react before the system can take control\n* A need for a clear view of the road ahead\n* A need for the system to detect a potential collision\n\nPlease note that these conditions may vary depending on the specific vehicle and AEB system.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 29.895,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas03",
+        "question": "For the 2024 Toyota Corolla in my owner's manual, what does the lane keeping system do and what must the driver still do?",
+        "category": "in_docs",
+        "expected_terms": [
+          "steering",
+          "driver",
+          "lane"
+        ],
+        "expected_source": "Toyota_Corolla_2024.pdf",
+        "expected_answer_source": "documents",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "documents",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": true,
+        "correct_citation": false,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From your documents: The 2024 Toyota Corolla's lane keeping system is not explicitly mentioned in the provided passages. However, the passages do describe the general functionality of lane keeping systems in vehicles. According to the passages, lane keeping systems alert the driver to potential threats with audible beeps, dashboard lights, or haptic vibrations, and may also take action to avoid hazards if the driver does not act. The passages also mention that lane keeping systems can relieve the driver of the need to maintain a consistent speed, monitor road signs, and alert the driver to take corrective action.\n\nThe passages do not explicitly state what the driver must still do when the lane keeping system is engaged. However, it can be inferred that the driver must remain engaged and attentive while the system is active, as the system is designed to assist the driver in the safe driving process. The passages also mention that the driver must check blind spots before changing lanes or backing up, and that the system should not be relied upon to the exclusion of ordinary safe driving practices.\n\nSources: (2021-ADAS-Guide-Preview.pdf, p. 0); (2021-ADAS-Guide-Preview.pdf, p. 1); (2021-ADAS-Guide-Preview.pdf, p. 2); (2021-ADAS-Guide-Preview.pdf, p. 3); (2021-ADAS-Guide-Preview.pdf, p. 5); (2021-ADAS-Guide-Preview.pdf, p. 6); (2021-ADAS-Guide-Preview.pdf, p. 8)",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 1,
+            "pdf_page": 1,
+            "printed_page": "0",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 0
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 2,
+            "pdf_page": 2,
+            "printed_page": "1",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 1
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 2,
+            "pdf_page": 2,
+            "printed_page": "1",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 2
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 3
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 8
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 7,
+            "pdf_page": 7,
+            "printed_page": "6",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 10
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 9,
+            "pdf_page": 9,
+            "printed_page": "8",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 13
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "For the 2024 Toyota Corolla in my owner's manual, what does the lane keeping system do and what must the driver still do?",
+              "strategy": "document_overview"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 1,
+                "printed_page": "0",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 9,
+                "printed_page": "8",
+                "neighbor": false
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 1,
+                "printed_page": "0",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 9,
+                "printed_page": "8",
+                "neighbor": false
+              }
+            ],
+            "decision": "answer"
+          }
+        ],
+        "tool_calls": 2,
+        "latency_seconds": 134.112,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": true,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": false,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "I don't have access to your owner's manual. However, according to the Toyota website, the 2024 Toyota Corolla's Lane Departure Alert with Steering Assist (LDA) system is designed to alert the driver if the vehicle drifts out of its lane without signaling. The system will also make subtle steering inputs to help guide the vehicle back into its lane. From general knowledge (unverified): The driver must still be attentive and actively engaged with the road to ensure safe driving.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 31.647,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas04",
+        "question": "What braking assumptions does the indexed manual state, and what stopping distance does the estimate give at 50 km/h on a wet road?",
+        "category": "in_docs",
+        "expected_terms": [
+          "wet",
+          "reaction",
+          "braking"
+        ],
+        "expected_source": "owners_manual.pdf",
+        "expected_answer_source": "documents",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "documents",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": true,
+        "correct_citation": false,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From your documents: The manual does not explicitly state any braking assumptions. However, it does discuss the stopping distance of a vehicle on a wet road. According to the manual, the stopping distance at 50 km/h on a wet road is not provided.\n\nSources: (2021-ADAS-Guide-Preview.pdf, p. 0); (2021-ADAS-Guide-Preview.pdf, p. 1); (2021-ADAS-Guide-Preview.pdf, p. 2); (2021-ADAS-Guide-Preview.pdf, p. 3); (2021-ADAS-Guide-Preview.pdf, p. 5); (2021-ADAS-Guide-Preview.pdf, p. 6); (2021-ADAS-Guide-Preview.pdf, p. 8)",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 1,
+            "pdf_page": 1,
+            "printed_page": "0",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 0
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 2,
+            "pdf_page": 2,
+            "printed_page": "1",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 1
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 2,
+            "pdf_page": 2,
+            "printed_page": "1",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 2
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 3
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 8
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 7,
+            "pdf_page": 7,
+            "printed_page": "6",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 10
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 9,
+            "pdf_page": 9,
+            "printed_page": "8",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 13
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "What braking assumptions does the indexed manual state, and what stopping distance does the estimate give at 50 km/h on a wet road?",
+              "strategy": "document_overview"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 1,
+                "printed_page": "0",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 9,
+                "printed_page": "8",
+                "neighbor": false
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 1,
+                "printed_page": "0",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 9,
+                "printed_page": "8",
+                "neighbor": false
+              }
+            ],
+            "decision": "answer"
+          }
+        ],
+        "tool_calls": 2,
+        "latency_seconds": 78.673,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "unknown",
+        "correct_answer": false,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": false,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "I'm not familiar with the specific indexed manual you're referring to. I can suggest checking the owner's manual or a reliable automotive source for the exact information.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 11.935,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas05",
+        "question": "How do camera-based and radar-based driver assistance systems differ in poor visibility?",
+        "category": "adas_not_in_docs",
+        "expected_terms": [
+          "camera",
+          "radar",
+          "visibility"
+        ],
+        "expected_source": "",
+        "expected_answer_source": "web_or_general",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "documents",
+        "correct_answer": true,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From your documents: Camera-based and radar-based driver assistance systems differ in poor visibility. Radar-based systems are less effective in poor visibility, as radar signals can be blocked by heavy rain, snow, or fog. In contrast, camera-based systems can still provide some functionality, such as lane departure warning and blind spot detection, even in poor visibility.\n\nSources: (2021-ADAS-Guide-Preview.pdf, p. 2); (2021-ADAS-Guide-Preview.pdf, p. 3); (2021-ADAS-Guide-Preview.pdf, p. 5); (2021-ADAS-Guide-Preview.pdf, p. 6)",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 4
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 6
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 8
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 7,
+            "pdf_page": 7,
+            "printed_page": "6",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 10
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "How do camera-based and radar-based driver assistance systems differ in poor visibility?"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": false
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": false
+              }
+            ],
+            "decision": "answer"
+          }
+        ],
+        "tool_calls": 2,
+        "latency_seconds": 65.5,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From general knowledge (unverified): Camera-based systems, such as lane departure warning and adaptive cruise control, rely on visible images from cameras mounted on the vehicle. In poor visibility, these cameras may struggle to capture clear images, leading to reduced system performance or false alerts. Radar-based systems, on the other hand, use radio waves to detect objects and distance, which can penetrate fog, rain, or other weather conditions, providing more reliable data in poor visibility.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 28.909,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas06",
+        "question": "Can a driver rely on lane keeping assistance to take their hands off the wheel?",
+        "category": "adas_not_in_docs",
+        "expected_terms": [
+          "driver",
+          "supervise",
+          "hands"
+        ],
+        "expected_source": "",
+        "expected_answer_source": "web_or_general",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "general_knowledge",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": true,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "Not found in your documents. From general knowledge (unverified): What vehicle model/year is the driver referring to?",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 3
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 4
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 6
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 9
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "Can a driver rely on lane keeping assistance to take their hands off the wheel?"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              }
+            ],
+            "decision": "no_answer"
+          },
+          {
+            "tool": "web_search",
+            "result": "skipped: web is on cooldown (22 min remaining)"
+          },
+          {
+            "tool": "ask_user",
+            "arguments": {
+              "question": "What vehicle model/year is the driver referring to?"
+            },
+            "result": "ok"
+          }
+        ],
+        "tool_calls": 4,
+        "latency_seconds": 41.647,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From general knowledge (unverified): Lane keeping assistance (LKA) is designed to help keep the vehicle within its lane, but it is not intended to replace the driver's attention and control of the vehicle. While LKA can provide a level of stability and guidance, it is not a substitute for the driver's hands-on control. The driver should always remain attentive and ready to take control of the vehicle if necessary.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 21.027,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas07",
+        "question": "What is a common limitation of blind spot monitoring when a motorcycle approaches quickly?",
+        "category": "adas_not_in_docs",
+        "expected_terms": [
+          "blind spot",
+          "motorcycle",
+          "driver"
+        ],
+        "expected_source": "",
+        "expected_answer_source": "web_or_general",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "documents",
+        "correct_answer": true,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From your documents: A common limitation of blind spot monitoring when a motorcycle approaches quickly is not explicitly stated in the passages.\n\nSources: (2021-ADAS-Guide-Preview.pdf, p. 2); (2021-ADAS-Guide-Preview.pdf, p. 3); (2021-ADAS-Guide-Preview.pdf, p. 5); (2021-ADAS-Guide-Preview.pdf, p. 6)",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 4
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 8
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 9
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 7,
+            "pdf_page": 7,
+            "printed_page": "6",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 10
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "What is a common limitation of blind spot monitoring when a motorcycle approaches quickly?"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": true
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": true
+              }
+            ],
+            "decision": "answer"
+          }
+        ],
+        "tool_calls": 2,
+        "latency_seconds": 44.209,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From general knowledge (unverified): Blind spot monitoring systems can struggle to detect motorcycles, especially when they approach quickly, due to their smaller size and lower profile compared to vehicles. This can lead to false negatives or delayed alerts, making it more challenging for drivers to detect and respond to the motorcycle's presence in their blind spot.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 13.071,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas08",
+        "question": "How should a driver respond if an ADAS sensor is blocked by snow or dirt?",
+        "category": "adas_not_in_docs",
+        "expected_terms": [
+          "sensor",
+          "clean",
+          "driver"
+        ],
+        "expected_source": "",
+        "expected_answer_source": "web_or_general",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "documents",
+        "correct_answer": true,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From your documents: If an ADAS sensor is blocked by snow or dirt, the driver should clean the sensor before proceeding.\n\nSources: (2021-ADAS-Guide-Preview.pdf, p. 1); (2021-ADAS-Guide-Preview.pdf, p. 2); (2021-ADAS-Guide-Preview.pdf, p. 3); (2021-ADAS-Guide-Preview.pdf, p. 5)",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 2,
+            "pdf_page": 2,
+            "printed_page": "1",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 2
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 3
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 4
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 8
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "How should a driver respond if an ADAS sensor is blocked by snow or dirt?"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              }
+            ],
+            "decision": "answer"
+          }
+        ],
+        "tool_calls": 2,
+        "latency_seconds": 79.573,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": false,
+        "correct_tier": true,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From general knowledge (unverified): If an ADAS sensor is blocked by snow or dirt, the driver should slow down and exercise caution, as the system's accuracy may be compromised. It's recommended to clean the sensor as soon as possible to restore the system's functionality.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 64.199,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas09",
+        "question": "Who won the 2024 Olympic men's 100 metre final?",
+        "category": "off_topic",
+        "expected_terms": [],
+        "expected_source": "",
+        "expected_answer_source": "declined",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "declined",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": true,
+        "correct_citation": null,
+        "correct_decline": true,
+        "false_decline": null,
+        "answer": "Out of scope: I can help with ADAS, driver assistance, vehicle safety systems, and related automotive technology. What would you like to know about one of those?",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 0.236,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "unknown",
+        "correct_answer": false,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": false,
+        "false_decline": null,
+        "answer": "I'm not aware of any information about the 2024 Olympic men's 100 meter final.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 20.323,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas10",
+        "question": "Give me a recipe for chocolate cake.",
+        "category": "off_topic",
+        "expected_terms": [],
+        "expected_source": "",
+        "expected_answer_source": "declined",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "declined",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": true,
+        "correct_citation": null,
+        "correct_decline": true,
+        "false_decline": null,
+        "answer": "Out of scope: I can help with ADAS, driver assistance, vehicle safety systems, and related automotive technology. What would you like to know about one of those?",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 0.003,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "unknown",
+        "correct_answer": false,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": false,
+        "false_decline": null,
+        "answer": "I'm not capable of providing recipes or cooking instructions.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 11.588,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas11",
+        "question": "What is the capital city of Japan?",
+        "category": "off_topic",
+        "expected_terms": [],
+        "expected_source": "",
+        "expected_answer_source": "declined",
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "general_knowledge",
+        "correct_answer": false,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": false,
+        "false_decline": null,
+        "answer": "Not found in your documents. From general knowledge (unverified): What is the make and model of the vehicle you are referring to?",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 1,
+            "pdf_page": 1,
+            "printed_page": "0",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 0
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 2,
+            "pdf_page": 2,
+            "printed_page": "1",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 1
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 3
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 3,
+            "pdf_page": 3,
+            "printed_page": "2",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 4
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 6
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "What is the capital city of Japan?"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 1,
+                "printed_page": "0",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              }
+            ]
+          },
+          {
+            "tool": "document_gate",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 1,
+                "printed_page": "0",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 2,
+                "printed_page": "1",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 3,
+                "printed_page": "2",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              }
+            ],
+            "decision": "no_answer"
+          },
+          {
+            "tool": "web_search",
+            "result": "skipped: web is on cooldown (17 min remaining)"
+          },
+          {
+            "tool": "ask_user",
+            "arguments": {
+              "question": "What is the make and model of the vehicle you are referring to?"
+            },
+            "result": "ok"
+          }
+        ],
+        "tool_calls": 4,
+        "latency_seconds": 47.073,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": false,
+        "correct_tier": false,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": false,
+        "false_decline": null,
+        "answer": "From general knowledge (unverified): The capital city of Japan is Tokyo.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 14.162,
+        "error": null
+      }
+    },
+    {
+      "question": {
+        "id": "adas12",
+        "question": "Does my car's AEB detect pedestrians and bicycles?",
+        "category": "adas_not_in_docs",
+        "expected_terms": [
+          "make",
+          "model",
+          "year"
+        ],
+        "expected_source": "",
+        "expected_answer_source": "general_knowledge",
+        "expect_clarification": true,
+        "placeholder": true
+      },
+      "agent": {
+        "answer_source": "general_knowledge",
+        "correct_answer": true,
+        "correct_tier": true,
+        "correct_tier_label": true,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "Not found in your documents. From general knowledge (unverified): Which vehicle make, model, and year do you mean? ADAS features vary by vehicle.",
+        "sources": [
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 4,
+            "pdf_page": 4,
+            "printed_page": "3",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 5
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 8
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 6,
+            "pdf_page": 6,
+            "printed_page": "5",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 9
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 7,
+            "pdf_page": 7,
+            "printed_page": "6",
+            "neighbor": false,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 10
+          },
+          {
+            "type": "document",
+            "source": "2021-ADAS-Guide-Preview.pdf",
+            "page": 7,
+            "pdf_page": 7,
+            "printed_page": "6",
+            "neighbor": true,
+            "system": "general",
+            "car_model": "",
+            "chunk_index": 11
+          }
+        ],
+        "tool_trace": [
+          {
+            "tool": "search_docs",
+            "arguments": {
+              "query": "Does my car's AEB detect pedestrians and bicycles?"
+            },
+            "result": "results",
+            "pages": [
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 4,
+                "printed_page": "3",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 6,
+                "printed_page": "5",
+                "neighbor": true
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": false
+              },
+              {
+                "source": "2021-ADAS-Guide-Preview.pdf",
+                "pdf_page": 7,
+                "printed_page": "6",
+                "neighbor": true
+              }
+            ]
+          },
+          {
+            "tool": "ask_user",
+            "arguments": {},
+            "result": "clarification requested"
+          }
+        ],
+        "tool_calls": 2,
+        "latency_seconds": 6.278,
+        "error": null
+      },
+      "baseline": {
+        "answer_source": "general_knowledge",
+        "correct_answer": false,
+        "correct_tier": true,
+        "correct_tier_label": false,
+        "correct_citation": null,
+        "correct_decline": null,
+        "false_decline": false,
+        "answer": "From general knowledge (unverified): Most modern vehicles with advanced safety features, including Automatic Emergency Braking (AEB), are equipped to detect pedestrians and bicycles. However, the specific capabilities of your car's AEB system may vary depending on the make, model, and year of your vehicle.",
+        "sources": [],
+        "tool_trace": [],
+        "tool_calls": 0,
+        "latency_seconds": 21.185,
+        "error": null
+      }
+    }
+  ]
+}

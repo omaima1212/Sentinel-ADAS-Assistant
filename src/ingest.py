@@ -93,6 +93,33 @@ def chunk_text(text, chunk_size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
     return chunks
 
 
+def extract_tables_text(page):
+    """Format detected PDF tables as header/value text for retrievable chunks."""
+    find_tables = getattr(page, "find_tables", None)
+    if find_tables is None:
+        return ""
+    try:
+        tables = find_tables().tables
+    except Exception:
+        return ""
+    formatted = []
+    for table_number, table in enumerate(tables, start=1):
+        rows = table.extract() or []
+        rows = [[clean_text(str(cell or "")) for cell in row] for row in rows]
+        rows = [row for row in rows if any(row)]
+        if not rows:
+            continue
+        headers = rows[0]
+        lines = [f"Table {table_number}: " + " | ".join(headers)]
+        for row in rows[1:]:
+            pairs = [f"{headers[i] or f'Column {i + 1}'}: {value}"
+                     for i, value in enumerate(row) if value]
+            if pairs:
+                lines.append("; ".join(pairs))
+        formatted.extend(lines)
+    return "\n".join(formatted)
+
+
 # French month names, because the test document dates its entries in French.
 # Extend this list for documents in other languages.
 MONTHS = ("janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|"
@@ -100,6 +127,17 @@ MONTHS = ("janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|"
           "January|February|March|April|May|June|July|August|September|"
           "October|November|December")
 DATE_RE = re.compile(rf"\b\d{{1,2}}\s+({MONTHS})\s+\d{{4}}\b", re.IGNORECASE)
+LEADING_PAGE_RE = re.compile(r"^(?:page\s+)?(\d{1,4})$", re.IGNORECASE)
+
+
+def parse_printed_page(page_text, page_label=None):
+    """Read a printed page number at the start of text, then a PDF page label."""
+    first_line = (str(page_text or "").lstrip().splitlines() or [""])[0].strip()
+    match = LEADING_PAGE_RE.fullmatch(first_line)
+    if match:
+        return match.group(1)
+    label = str(page_label or "").strip()
+    return label or None
 
 
 def extract_dates(text):
@@ -182,6 +220,37 @@ def load_and_chunk(pdf_path, chunk_size=CHUNK_SIZE, overlap=CHUNK_OVERLAP,
     if verbose:
         print(f"  -> {len(chunks)} chunks "
               f"({chunk_size} words each, {overlap} word overlap)")
+    return chunks
+
+
+def load_pdf_page_chunks(pdf_path, chunk_size=CHUNK_SIZE,
+                         overlap=CHUNK_OVERLAP, verbose=True):
+    """Return (text, page) chunks, keeping every chunk tied to its PDF page."""
+    pdf_path = Path(pdf_path)
+    if not pdf_path.exists():
+        raise FileNotFoundError(f"No such PDF: {pdf_path}")
+    if overlap >= chunk_size:
+        raise ValueError("overlap must be smaller than chunk_size")
+    chunks = []
+    with fitz.open(pdf_path) as doc:
+        for page_number, page in enumerate(doc, start=1):
+            page_text = page.get_text()
+            try:
+                page_label = page.get_label()
+            except Exception:
+                page_label = None
+            printed_page = parse_printed_page(page_text, page_label)
+            table_text = extract_tables_text(page)
+            # The regular text extraction may flatten table columns. Appending
+            # an explicit header/value rendering preserves their relationships.
+            cleaned = clean_text(page_text + ("\n\n" + table_text if table_text else ""))
+            for text in chunk_text(cleaned, chunk_size, overlap):
+                chunks.append({"text": text, "page": page_number,
+                               "pdf_page": page_number,
+                               "printed_page": printed_page})
+    if verbose:
+        print(f"  -> {len(chunks)} page-aware chunks ({chunk_size} words, "
+              f"{overlap} overlap)")
     return chunks
 
 

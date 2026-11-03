@@ -15,7 +15,7 @@ import chromadb
 import requests
 
 from config import CHROMA_DIR, EMBED_MODEL, OLLAMA_URL
-from ingest import load_and_chunk
+from ingest import load_and_chunk, load_pdf_page_chunks
 
 COLLECTION_NAME = "documents"
 
@@ -78,8 +78,21 @@ def get_collection(name=COLLECTION_NAME):
     )
 
 
+def has_page_metadata(collection):
+    """Whether every stored chunk has current physical and printed page keys."""
+    if not collection.count():
+        return True
+    data = collection.get(include=["metadatas"])
+    metadatas = data.get("metadatas") or []
+    return bool(metadatas) and all(
+        meta and "pdf_page" in meta and "printed_page" in meta
+        for meta in metadatas)
+
+
 def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
-              chunk_size=None, overlap=None, headers=None, verbose=True):
+              chunk_size=None, overlap=None, headers=None, verbose=True,
+              system="general", source_type="reference", car_model="",
+              source_hash="", document_id=None):
     """Full indexing pipeline: PDF -> chunks -> vectors -> stored in Chroma."""
     from config import (CHUNK_OVERLAP, CHUNK_SIZE, HEADER_INCLUDE_FILENAME,
                        USE_CONTEXT_HEADERS)
@@ -90,8 +103,12 @@ def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
     headers = USE_CONTEXT_HEADERS if headers is None else headers
 
     pdf_path = Path(pdf_path)
-    chunks = load_and_chunk(pdf_path, chunk_size=chunk_size,
-                            overlap=overlap, verbose=verbose)
+    doc_id = document_id or pdf_path.stem
+    page_chunks = load_pdf_page_chunks(pdf_path, chunk_size=chunk_size,
+                                       overlap=overlap, verbose=verbose)
+    if not page_chunks:
+        raise ValueError(f"No text could be extracted from '{pdf_path}'.")
+    chunks = [item["text"] for item in page_chunks]
 
     if headers:
         chunks = add_context_headers(chunks, pdf_path.name,
@@ -102,6 +119,10 @@ def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
 
     collection = get_collection(collection_name)
 
+    old = collection.get(where={"source": pdf_path.name},
+                         include=["metadatas"])
+    old_ids = set(old.get("ids") or [])
+
     if verbose:
         print(f"\nEmbedding {len(chunks)} chunks with {EMBED_MODEL}...")
     ids, vectors, metadatas = [], [], []
@@ -110,9 +131,19 @@ def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
         # Deterministic IDs: re-indexing the same PDF OVERWRITES the old
         # entries instead of creating duplicate copies. Duplicate chunks are a
         # nasty bug - they crowd out genuinely different results in top-k.
-        ids.append(f"{pdf_path.stem}::{i}")
+        ids.append(f"{doc_id}::{i}")
         vectors.append(embed_text(chunk))
-        metadatas.append({"source": pdf_path.name, "chunk_index": i})
+        metadatas.append({"source": pdf_path.name,
+                          "source_path": str(pdf_path.resolve()),
+                          "chunk_index": i,
+                          "page": page_chunks[i]["pdf_page"],
+                          "pdf_page": page_chunks[i]["pdf_page"],
+                          # ChromaDB metadata values cannot be Python None;
+                          # empty string is normalized back to None on read.
+                          "printed_page": page_chunks[i].get("printed_page") or "",
+                          "system": system, "source_type": source_type,
+                          "car_model": car_model,
+                          "source_hash": source_hash or "unknown"})
         if verbose:
             print(f"  chunk {i + 1}/{len(chunks)} embedded "
                   f"({len(vectors[-1])} dimensions)")
@@ -123,6 +154,10 @@ def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
         documents=chunks,
         metadatas=metadatas,
     )
+
+    stale_ids = old_ids.difference(ids)
+    if stale_ids:
+        collection.delete(ids=list(stale_ids))
 
     if verbose:
         print(f"\nStored {len(chunks)} chunks in {CHROMA_DIR}")

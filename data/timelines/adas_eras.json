@@ -1,0 +1,43 @@
+[
+  {
+    "era": "Safety and convenience",
+    "start": 1950,
+    "end": 2000,
+    "examples": ["Seat belts", "Cruise control", "ABS"],
+    "source": "2021-ADAS-Guide-Preview.pdf",
+    "page": 4
+  },
+  {
+    "era": "Advanced safety features",
+    "start": 2000,
+    "end": 2010,
+    "examples": ["ESC", "Lane departure warning", "Blind-spot detection"],
+    "source": "2021-ADAS-Guide-Preview.pdf",
+    "page": 4
+  },
+  {
+    "era": "Advanced driver assistance",
+    "start": 2010,
+    "end": 2016,
+    "examples": ["Rear cameras", "Lane centering", "Rear cross-traffic alert", "AEB"],
+    "source": "2021-ADAS-Guide-Preview.pdf",
+    "page": 4
+  },
+  {
+    "era": "Partially automated safety",
+    "start": 2016,
+    "end": 2025,
+    "examples": ["Lane keeping", "ACC", "Traffic jam assist", "Self-park"],
+    "source": "2021-ADAS-Guide-Preview.pdf",
+    "page": 4
+  },
+  {
+    "era": "Fully automated safety",
+    "start": 2025,
+    "end": null,
+    "examples": ["Predicted by NHTSA"],
+    "status": "predicted",
+    "source": "2021-ADAS-Guide-Preview.pdf",
+    "page": 4
+  }
+]

@@ -33,18 +33,20 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from flask import Flask, Response, jsonify, request, send_from_directory
 
+from citations import citation_line
 import websearch
 from config import CHAT_MODEL, CHUNK_OVERLAP, CHUNK_SIZE, EMBED_MODEL, \
     HEADER_INCLUDE_FILENAME, OLLAMA_URL, TOP_K, USE_CONTEXT_HEADERS, \
     WEB_SEARCH_BACKEND
-from embed import embed_text, get_collection
+from embed import embed_text, get_collection, has_page_metadata
 from generate import (WEB_SYSTEM_PROMPT, ask_model_stream, build_prompt,
                       build_web_prompt, looks_like_refusal)
-from ingest import add_context_headers, load_and_chunk
+from ingest import add_context_headers, load_pdf_page_chunks
 from retrieve import retrieve
 
 UPLOAD_DIR = Path(__file__).parent.parent / "uploads"
 WEB_DIR = Path(__file__).parent / "web"
+CHART_DIR = Path(__file__).parent.parent / "results" / "charts"
 
 app = Flask(__name__, static_folder=None)
 
@@ -62,8 +64,10 @@ app = Flask(__name__, static_folder=None)
 _index_cache = {}
 
 
-def index_pdf_bytes(file_bytes, file_name):
-    digest = hashlib.sha256(file_bytes).hexdigest()[:12]
+def index_pdf_bytes(file_bytes, file_name, system="general",
+                    source_type="reference", car_model=""):
+    identity = (file_bytes + f"\0{system}\0{source_type}\0{car_model}".encode())
+    digest = hashlib.sha256(identity).hexdigest()[:12]
     if digest in _index_cache:
         return _index_cache[digest]
 
@@ -74,13 +78,17 @@ def index_pdf_bytes(file_bytes, file_name):
     collection_name = f"upload_{digest}"
     collection = get_collection(collection_name)
 
-    if collection.count() > 0:
+    if collection.count() > 0 and has_page_metadata(collection):
         result = (collection_name, collection.count(), True)
         _index_cache[digest] = result
         return result
+    old = collection.get(where={"source": file_name}, include=["metadatas"])
+    old_ids = set(old.get("ids") or [])
+    if old_ids:
+        print(f"Re-indexing {file_name}: stored chunks lack printed_page metadata.")
 
-    chunks = load_and_chunk(path, verbose=False)
-    if not chunks:
+    page_chunks = load_pdf_page_chunks(path, verbose=False)
+    if not page_chunks:
         # A PDF with no extractable text - most commonly a scanned page
         # with no text layer. Caught here rather than left to surface as a
         # raw ValueError from Chroma's upsert(), which rejects an empty ids
@@ -94,6 +102,7 @@ def index_pdf_bytes(file_bytes, file_name):
             "OCR is not supported. See README.md, Known limitations."
         )
 
+    chunks = [item["text"] for item in page_chunks]
     if USE_CONTEXT_HEADERS:
         chunks = add_context_headers(chunks, file_name,
                                      include_filename=HEADER_INCLUDE_FILENAME)
@@ -102,9 +111,20 @@ def index_pdf_bytes(file_bytes, file_name):
         ids=[f"{digest}::{i}" for i in range(len(chunks))],
         embeddings=[embed_text(c) for c in chunks],
         documents=chunks,
-        metadatas=[{"source": file_name, "chunk_index": i}
+        metadatas=[{"source": file_name,
+                    "source_path": str(path.resolve()),
+                    "chunk_index": i,
+                    "page": page_chunks[i]["pdf_page"],
+                    "pdf_page": page_chunks[i]["pdf_page"],
+                    "printed_page": page_chunks[i].get("printed_page") or "",
+                    "system": system,
+                    "source_type": source_type, "car_model": car_model}
                    for i in range(len(chunks))],
     )
+    new_ids = {f"{digest}::{i}" for i in range(len(chunks))}
+    stale_ids = old_ids.difference(new_ids)
+    if stale_ids:
+        collection.delete(ids=list(stale_ids))
     result = (collection_name, len(chunks), False)
     _index_cache[digest] = result
     return result
@@ -135,6 +155,21 @@ def index():
     # still avoids re-downloading unchanged bytes (a 304 covers that), it
     # just can no longer assume "unchanged" without checking first.
     return send_from_directory(WEB_DIR, "index.html", max_age=0)
+
+
+@app.get("/charts/<path:filename>")
+def serve_chart(filename):
+    """Serve only PNGs directly inside the generated charts directory."""
+    from pathlib import PurePosixPath, PureWindowsPath
+
+    posix_path = PurePosixPath(filename)
+    windows_path = PureWindowsPath(filename)
+    if (".." in posix_path.parts or ".." in windows_path.parts
+            or posix_path.is_absolute() or windows_path.is_absolute()
+            or posix_path.name != filename or windows_path.name != filename
+            or Path(filename).suffix.lower() != ".png"):
+        return jsonify({"error": "Not found"}), 404
+    return send_from_directory(CHART_DIR, filename, mimetype="image/png")
 
 
 @app.get("/api/health")
@@ -169,9 +204,12 @@ def upload():
         return jsonify({"error": "No file selected"}), 400
 
     file_bytes = file.read()
+    system = (request.form.get("system") or "general").strip()[:80]
+    source_type = (request.form.get("source_type") or "reference").strip()[:80]
+    car_model = (request.form.get("car_model") or "").strip()[:120]
     try:
         collection_name, chunk_count, was_cached = index_pdf_bytes(
-            file_bytes, file.filename
+            file_bytes, file.filename, system, source_type, car_model
         )
     except ValueError as e:
         # No extractable text (scanned PDF) - a clear 4xx, not a 500.
@@ -238,6 +276,10 @@ def ask():
             for fragment in ask_model_stream(prompt):
                 full_answer += fragment
                 yield json.dumps({"type": "token", "text": fragment}) + "\n"
+            citations = citation_line(hits)
+            if citations:
+                full_answer += "\n\n" + citations
+                yield json.dumps({"type": "token", "text": "\n\n" + citations}) + "\n"
         except RuntimeError as e:
             yield json.dumps({"type": "error", "message": str(e)}) + "\n"
             return
@@ -268,6 +310,24 @@ def ask():
         yield json.dumps({"type": "done"}) + "\n"
 
     return Response(stream(), mimetype="application/x-ndjson")
+
+
+@app.post("/api/agent")
+def ask_agent_route():
+    """Run the ADAS agent against the shared ADAS collection."""
+    body = request.get_json(silent=True) or {}
+    question = (body.get("question") or "").strip()
+    mode = body.get("mode", "assistant")
+    history = body.get("history") or []
+    if not question:
+        return jsonify({"error": "question must not be empty"}), 400
+    try:
+        from agent import ask_agent as run_agent
+        return jsonify(run_agent(question, mode=mode, history=history))
+    except RuntimeError as e:
+        return jsonify({"error": str(e)}), 503
+    except Exception as e:
+        return jsonify({"error": f"Agent request failed: {e}"}), 500
 
 
 if __name__ == "__main__":

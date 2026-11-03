@@ -16,11 +16,15 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data"          # put your test PDFs here
 CHROMA_DIR = PROJECT_ROOT / "chroma_db"   # vector database persists here
+ADAS_DATA_DIR = DATA_DIR / "adas"
+ADAS_METADATA_FILE = ADAS_DATA_DIR / "metadata.json"
+ADAS_COLLECTION_NAME = "adas_documents"
 
 # --- Ollama ----------------------------------------------------------------
 OLLAMA_URL = "http://localhost:11434"
 EMBED_MODEL = "nomic-embed-text"   # used for BOTH indexing and querying
 CHAT_MODEL = "llama3.2:3b"
+CHAT_MODEL_CANDIDATES = ("llama3.2:3b", "qwen2.5:3b")
 
 # --- Chunking --------------------------------------------------------------
 # Measured in words, not characters.
@@ -50,6 +54,32 @@ HEADER_INCLUDE_FILENAME = False
 
 # --- Retrieval -------------------------------------------------------------
 TOP_K = 3             # how many chunks to retrieve per question
+EXPAND_NEIGHBORS = os.environ.get("EXPAND_NEIGHBORS", "true").strip().lower() not in {
+    "0", "false", "no", "off",
+}
+MAX_AGENT_ITERATIONS = 4
+AGENT_KEEP_ALIVE = "30m"
+AGENT_NUM_CTX = 4096
+AGENT_NUM_PREDICT = 320
+AGENT_REQUEST_TIMEOUT_SECONDS = 600
+MODEL_CHECK_KEEP_ALIVE = "0"
+QUIZ_MAX_QUESTIONS = 5
+USE_HYBRID = False
+HYBRID_RRF_K = 60
+HYBRID_CANDIDATE_K = 10
+ADAS_SCOPE_KEYWORDS = (
+    "adas", "driver assist", "assisted driving", "autonomous driving",
+    "aeb", "automatic emergency braking", "acc", "adaptive cruise",
+    "cruise control", "lka", "lane keep", "lane keeping", "lane departure",
+    "blind spot", "bsd", "fcw", "collision warning", "parking assist",
+    "driver monitoring", "sae j3016", "vehicle safety", "automotive safety",
+    "traction control", "abs", "esc", "airbag", "car", "vehicle", "braking",
+)
+ADAS_VEHICLE_MAKES = (
+    "toyota", "volkswagen", "vw", "tesla", "honda", "ford", "bmw",
+    "mercedes", "audi", "hyundai", "kia", "nissan", "subaru", "volvo",
+    "mazda", "lexus", "chevrolet", "chevy", "jeep", "peugeot", "renault",
+)
 
 # --- Web fallback (optional, OFF by default) --------------------------------
 # A deliberate exception to this project's core promise ("nothing leaves the
@@ -98,3 +128,4 @@ WEB_SEARCH_BACKEND = "duckduckgo"
 GOOGLE_SEARCH_API_KEY = os.environ.get("GOOGLE_SEARCH_API_KEY", "")
 GOOGLE_SEARCH_ENGINE_ID = os.environ.get("GOOGLE_SEARCH_ENGINE_ID", "")
 WEB_FALLBACK_MAX_RESULTS = 3
+WEB_COOLDOWN_MINUTES = int(os.environ.get("WEB_COOLDOWN_MINUTES") or "30")

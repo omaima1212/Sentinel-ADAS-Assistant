@@ -27,15 +27,18 @@ import websearch
 from config import (CHAT_MODEL, CHUNK_OVERLAP, CHUNK_SIZE, EMBED_MODEL,
                     HEADER_INCLUDE_FILENAME, OLLAMA_URL, TOP_K,
                     USE_CONTEXT_HEADERS, WEB_SEARCH_BACKEND)
-from embed import embed_text, get_collection
+from citations import citation_line, page_reference
+from embed import embed_text, get_collection, has_page_metadata
 from generate import (WEB_SYSTEM_PROMPT, ask_model_stream, build_prompt,
                       build_web_prompt, looks_like_refusal)
-from ingest import add_context_headers, load_and_chunk
+from ingest import add_context_headers, load_pdf_page_chunks
 from retrieve import retrieve
 
 UPLOAD_DIR = Path(__file__).parent.parent / "uploads"
 
-st.set_page_config(page_title="Ask your PDF", page_icon="📄", layout="centered")
+st.set_page_config(page_title="Sentinel | ADAS Assistant", page_icon="\U0001f6e1", layout="centered")
+st.title("\U0001f6e1 Sentinel")
+st.caption("Your AI assistant for understanding ADAS")
 
 # Minimal CSS. Streamlit's theme (.streamlit/config.toml) handles colour;
 # this only fixes spacing and styles the similarity chips, which have no
@@ -95,11 +98,15 @@ def index_uploaded_pdf(file_bytes, file_name):
     collection_name = f"upload_{digest}"
 
     collection = get_collection(collection_name)
-    if collection.count() > 0:
+    old = collection.get(where={"source": file_name}, include=["metadatas"])
+    old_ids = set(old.get("ids") or [])
+    if collection.count() > 0 and has_page_metadata(collection):
         return collection_name, collection.count(), True
+    if old_ids:
+        print(f"Re-indexing {file_name}: stored chunks lack printed_page metadata.")
 
-    chunks = load_and_chunk(path, verbose=False)
-    if not chunks:
+    page_chunks = load_pdf_page_chunks(path, verbose=False)
+    if not page_chunks:
         # A PDF with no extractable text - most commonly a scanned page with
         # no text layer. Left unguarded, Chroma's upsert() rejects an empty
         # ids list with a raw ValueError ("Expected IDs to be a non-empty
@@ -111,17 +118,27 @@ def index_uploaded_pdf(file_bytes, file_name):
             "means it is a scanned document (an image with no text layer) - "
             "OCR is not supported. See README.md, Known limitations."
         )
+    chunks = [item["text"] for item in page_chunks]
     if USE_CONTEXT_HEADERS:
         chunks = add_context_headers(chunks, file_name,
                                      include_filename=HEADER_INCLUDE_FILENAME)
 
+    new_ids = [f"{digest}::{i}" for i in range(len(chunks))]
     collection.upsert(
-        ids=[f"{digest}::{i}" for i in range(len(chunks))],
+        ids=new_ids,
         embeddings=[embed_text(c) for c in chunks],
         documents=chunks,
-        metadatas=[{"source": file_name, "chunk_index": i}
+        metadatas=[{"source": file_name,
+                    "source_path": str(path.resolve()),
+                    "chunk_index": i,
+                    "page": page_chunks[i]["pdf_page"],
+                    "pdf_page": page_chunks[i]["pdf_page"],
+                    "printed_page": page_chunks[i].get("printed_page") or ""}
                    for i in range(len(chunks))],
     )
+    stale_ids = old_ids.difference(new_ids)
+    if stale_ids:
+        collection.delete(ids=list(stale_ids))
     return collection_name, len(chunks), False
 
 
@@ -156,17 +173,17 @@ def render_sources(hits):
             "*irrelevant* chunk scored 0.43."
         )
         for rank, hit in enumerate(hits, start=1):
-            sim = hit["similarity"]
-            # Scale the bar across the range actually observed, not 0-1.
-            # A 0-1 bar would show every real result as roughly half full and
-            # convey nothing.
-            width = max(4, min(100, (sim - 0.30) / 0.40 * 100))
+            sim = hit.get("similarity")
             weak = "" if rank == 1 else " weak"
+            page = page_reference(hit)
             st.markdown(
                 f"<span class='chip{weak}'>#{rank}</span>"
                 f"<span class='chip{weak}'>chunk {hit['chunk_index']}</span>"
-                f"<span class='chip{weak}'>{sim:.4f}</span>"
-                f"<div class='bar'><div style='width:{width:.0f}%'></div></div>",
+                + (f"<span class='chip{weak}'>{page}</span>" if page else "")
+                + ("<span class='chip'>neighbor</span>" if hit.get("neighbor") else "")
+                + (f"<span class='chip{weak}'>{sim:.4f}</span>"
+                   f"<div class='bar'><div style='width:{max(4, min(100, (sim - 0.30) / 0.40 * 100)):.0f}%'></div></div>"
+                   if sim is not None else ""),
                 unsafe_allow_html=True,
             )
             st.text(hit["text"][:900] + ("…" if len(hit["text"]) > 900 else ""))
@@ -256,14 +273,14 @@ with st.sidebar:
 # --------------------------------------------------------------------------
 
 if not ollama_is_running():
-    st.title("Ask your PDF")
+    st.title("Sentinel")
     st.warning("Ollama is not running. Start it, then reload this page.")
     st.stop()
 
 if uploaded is None:
-    st.title("Ask your PDF")
-    st.caption("Answers come only from the document you upload. If the answer "
-               "is not in the text, the system says so instead of inventing one.")
+    st.title("Sentinel")
+    st.markdown("Hi, I'm Sentinel. Ask me anything about ADAS: how AEB, adaptive cruise control or lane keeping work, what the SAE levels mean, or what a warning on your dashboard is telling you.")
+    st.caption("Sentinel assists understanding only. ADAS assists the driver and does not replace them.")
     st.info("Upload a PDF in the sidebar to begin.")
     st.stop()
 
@@ -273,11 +290,11 @@ with st.spinner("Indexing the document…"):
             uploaded.getvalue(), uploaded.name
         )
     except ValueError as e:
-        st.title("Ask your PDF")
+        st.title("Sentinel")
         st.error(str(e))
         st.stop()
     except RuntimeError as e:
-        st.title("Ask your PDF")
+        st.title("Sentinel")
         st.error(str(e))
         st.stop()
 
@@ -329,6 +346,10 @@ if question:
             answer = st.write_stream(
                 ask_model_stream(build_prompt(question, hits))
             )
+            citations = citation_line(hits)
+            if citations:
+                st.markdown(citations)
+                answer = f"{answer}\n\n{citations}"
             render_sources(hits)
 
             # NOTE: the live path below deliberately does NOT call
@@ -372,3 +393,5 @@ if question:
             st.error(str(e))
         except Exception as e:
             st.error(f"Unexpected error: {e}")
+
+st.caption("Sentinel assists understanding only. ADAS assists the driver and does not replace them.")

@@ -1,0 +1,111 @@
+[
+  {
+    "id": "adas01",
+    "question": "According to SAE J3016, who performs the driving task and supervises the environment at Level 2?",
+    "category": "in_docs",
+    "expected_terms": ["driver supervises", "driver performs", "supervises the environment"],
+    "expected_source": "SAE_J3016.pdf",
+    "expected_answer_source": "documents",
+    "placeholder": true
+  },
+  {
+    "id": "adas02",
+    "question": "What conditions or limitations does the source give for AEB operation?",
+    "category": "in_docs",
+    "expected_terms": ["limitations", "conditions", "pedestrian"],
+    "expected_source": "AEB_reference.pdf",
+    "expected_answer_source": "documents",
+    "placeholder": true
+  },
+  {
+    "id": "adas03",
+    "question": "For the 2024 Toyota Corolla in my owner's manual, what does the lane keeping system do and what must the driver still do?",
+    "category": "in_docs",
+    "expected_terms": ["steering", "driver", "lane"],
+    "expected_source": "Toyota_Corolla_2024.pdf",
+    "expected_answer_source": "documents",
+    "placeholder": true
+  },
+  {
+    "id": "adas04",
+    "question": "What braking assumptions does the indexed manual state, and what stopping distance does the estimate give at 50 km/h on a wet road?",
+    "category": "in_docs",
+    "expected_terms": ["wet", "reaction", "braking"],
+    "expected_source": "owners_manual.pdf",
+    "expected_answer_source": "documents",
+    "placeholder": true
+  },
+  {
+    "id": "adas05",
+    "question": "How do camera-based and radar-based driver assistance systems differ in poor visibility?",
+    "category": "adas_not_in_docs",
+    "expected_terms": ["camera", "radar", "visibility"],
+    "expected_source": "",
+    "expected_answer_source": "web_or_general",
+    "placeholder": true
+  },
+  {
+    "id": "adas06",
+    "question": "Can a driver rely on lane keeping assistance to take their hands off the wheel?",
+    "category": "adas_not_in_docs",
+    "expected_terms": ["driver", "supervise", "hands"],
+    "expected_source": "",
+    "expected_answer_source": "web_or_general",
+    "placeholder": true
+  },
+  {
+    "id": "adas07",
+    "question": "What is a common limitation of blind spot monitoring when a motorcycle approaches quickly?",
+    "category": "adas_not_in_docs",
+    "expected_terms": ["blind spot", "motorcycle", "driver"],
+    "expected_source": "",
+    "expected_answer_source": "web_or_general",
+    "placeholder": true
+  },
+  {
+    "id": "adas08",
+    "question": "How should a driver respond if an ADAS sensor is blocked by snow or dirt?",
+    "category": "adas_not_in_docs",
+    "expected_terms": ["sensor", "clean", "driver"],
+    "expected_source": "",
+    "expected_answer_source": "web_or_general",
+    "placeholder": true
+  },
+  {
+    "id": "adas09",
+    "question": "Who won the 2024 Olympic men's 100 metre final?",
+    "category": "off_topic",
+    "expected_terms": [],
+    "expected_source": "",
+    "expected_answer_source": "declined",
+    "placeholder": true
+  },
+  {
+    "id": "adas10",
+    "question": "Give me a recipe for chocolate cake.",
+    "category": "off_topic",
+    "expected_terms": [],
+    "expected_source": "",
+    "expected_answer_source": "declined",
+    "placeholder": true
+  },
+  {
+    "id": "adas11",
+    "question": "What is the capital city of Japan?",
+    "category": "off_topic",
+    "expected_terms": [],
+    "expected_source": "",
+    "expected_answer_source": "declined",
+    "placeholder": true
+  },
+  {
+    "id": "adas12",
+    "question": "Does my car's AEB detect pedestrians and bicycles?",
+    "category": "adas_not_in_docs",
+    "expected_terms": ["make", "model", "year"],
+    "expected_source": "",
+    "expected_answer_source": "general_knowledge",
+    "expect_clarification": true,
+    "placeholder": true
+  }
+]

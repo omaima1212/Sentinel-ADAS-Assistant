@@ -1,27 +1,30 @@
-<title>Ask your PDF</title>
+<title>Sentinel | ADAS Assistant</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Sentinel is a local, privacy-friendly chatbot that explains driver assistance systems using your documents, with an AI agent that can also search the web when the documents don't cover a question.">
 <style>
   :root {
+    --bg: #0B1120; --card: #151F32; --hover: #1E293B; --border: #273449;
+    --text: #F8FAFC; --muted: #94A3B8; --turquoise: #2DD4BF;
+    --turquoise-dark: #14B8A6; --turquoise-light: #99F6E4;
     --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px; --radius-pill: 999px;
     --font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI",
             Inter, Roboto, Helvetica, Arial, sans-serif;
     --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
     --ease: cubic-bezier(.2,.8,.2,1);
 
-    --bg: #0a0c11; --bg-2: #12151d; --bg-3: #1b1f2a; --bg-hover: #232837;
-    --border: rgba(255,255,255,.08); --border-strong: rgba(255,255,255,.16);
-    --text: #edeef2; --text-muted: #8b93a3; --text-faint: #5b6270;
-    --accent: #7C9EF5; --accent-2: #B18CF5;
-    --accent-weak: rgba(124,158,245,.14); --accent-weak-2: rgba(177,140,245,.14);
-    --success: #3ddc84; --danger: #ff6b6b; --danger-weak: rgba(255,107,107,.12);
+    --bg-2: var(--card); --bg-3: var(--hover); --bg-hover: var(--hover);
+    --border-strong: #34445F; --text-muted: var(--muted); --text-faint: var(--muted);
+    --accent: var(--turquoise); --accent-2: var(--turquoise-dark);
+    --accent-weak: rgba(45,212,191,.12); --accent-weak-2: rgba(45,212,191,.06);
+    --success: #34D399; --danger: #FB7185; --danger-weak: rgba(251,113,133,.12);
     --shadow: 0 8px 30px rgba(0,0,0,.35);
   }
   :root[data-theme="light"] {
     --bg: #f7f8fb; --bg-2: #ffffff; --bg-3: #f0f2f6; --bg-hover: #e8ebf1;
     --border: rgba(15,23,42,.08); --border-strong: rgba(15,23,42,.16);
     --text: #14161c; --text-muted: #666e7d; --text-faint: #9aa1ad;
-    --accent: #4A6FE0; --accent-2: #8352E0;
-    --accent-weak: rgba(74,111,224,.09); --accent-weak-2: rgba(131,82,224,.09);
+    --accent: #1D4ED8; --accent-2: #1D4ED8;
+    --accent-weak: rgba(8,127,140,.10); --accent-weak-2: rgba(8,127,140,.06);
     --success: #17a05a; --danger: #e5484d; --danger-weak: rgba(229,72,77,.08);
     --shadow: 0 8px 30px rgba(20,22,28,.08);
   }
@@ -30,8 +33,8 @@
       --bg: #f7f8fb; --bg-2: #ffffff; --bg-3: #f0f2f6; --bg-hover: #e8ebf1;
       --border: rgba(15,23,42,.08); --border-strong: rgba(15,23,42,.16);
       --text: #14161c; --text-muted: #666e7d; --text-faint: #9aa1ad;
-      --accent: #4A6FE0; --accent-2: #8352E0;
-      --accent-weak: rgba(74,111,224,.09); --accent-weak-2: rgba(131,82,224,.09);
+      --accent: #1D4ED8; --accent-2: #1D4ED8;
+      --accent-weak: rgba(8,127,140,.10); --accent-weak-2: rgba(8,127,140,.06);
       --success: #17a05a; --danger: #e5484d; --danger-weak: rgba(229,72,77,.08);
       --shadow: 0 8px 30px rgba(20,22,28,.08);
     }
@@ -62,7 +65,18 @@
     display: flex; align-items: center; justify-content: center; flex: none;
     box-shadow: 0 2px 10px var(--accent-weak); }
   .brand-icon svg { width: 16px; height: 16px; color: #fff; }
-  .brand-name { font-weight: 650; font-size: .96rem; letter-spacing: -.01em; flex: 1; }
+  .brand-name { font-weight: 700; font-size: 1rem; letter-spacing: -.01em; }
+  .brand-copy { display: flex; flex-direction: column; gap: .12rem; flex: 1; }
+  .brand-tagline { color: var(--text-muted); font-size: .72rem; }
+  .main-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 1rem 1.6rem; border-bottom: 1px solid var(--border); }
+  .main-brand { display: flex; align-items: center; gap: .7rem; }
+  .main-brand svg { width: 28px; height: 28px; color: var(--accent); }
+  .main-brand-copy { display: flex; flex-direction: column; gap: .1rem; }
+  .main-brand-name { font-size: 1.02rem; font-weight: 700; }
+  .main-tagline { color: var(--text-muted); font-size: .76rem; }
+  .header-mode { width: auto; min-width: 170px; margin: 0; }
+  .brand-icon { background: var(--accent); }
 
   .icon-btn {
     width: 30px; height: 30px; border-radius: var(--radius-sm); border: 1px solid var(--border);
@@ -89,6 +103,9 @@
   .dropzone svg { width: 20px; height: 20px; color: var(--accent); }
   .dropzone u { text-decoration: underline; text-underline-offset: 2px; color: var(--accent); }
   .dropzone .fname { font-weight: 600; color: var(--text); word-break: break-word; }
+  .metadata-input { width: 100%; margin-top: .45rem; padding: .55rem .65rem;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-3);
+    color: var(--text); font: .8rem var(--font); }
 
   .status-pill {
     display: inline-flex; align-items: center; gap: .5rem; font-size: .84rem;
@@ -165,7 +182,12 @@
   }
   .empty-icon svg { width: 26px; height: 26px; color: var(--accent); }
   .empty-state h1 { font-size: 1.5rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
-  .empty-state p { color: var(--text-muted); font-size: .92rem; max-width: 440px; margin: 0 auto; line-height: 1.55; }
+  .empty-state p { color: var(--text-muted); font-size: .92rem; max-width: 560px; margin: 0 auto; line-height: 1.55; }
+  .example-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin: 1.2rem auto 0; max-width: 650px; }
+  .example-chip { border: 1px solid var(--border-strong); border-radius: var(--radius-pill); padding: .5rem .8rem;
+    color: var(--text-muted); background: var(--bg-2); cursor: pointer; font: .78rem var(--font); }
+  .example-chip:hover { border-color: var(--accent); color: var(--text); background: var(--accent-weak); }
+  .safety-footer { text-align: center; color: var(--text-faint); font-size: .7rem; padding: .5rem 1rem .7rem; }
 
   .doc-bar {
     display: flex; align-items: center; gap: .6rem; padding: .65rem 1rem;
@@ -197,6 +219,26 @@
             white-space: pre-wrap; font-size: .93rem; word-wrap: break-word; }
   .msg.user .bubble { background: var(--accent-weak); border: 1px solid transparent; border-bottom-right-radius: 4px; }
   .msg.assistant .bubble { background: var(--bg-2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .answer-badge { display: inline-flex; width: fit-content; padding: .18rem .5rem;
+    border-radius: 999px; font-size: .68rem; font-weight: 700; text-transform: uppercase; }
+  .answer-badge.documents { background: rgba(61,220,132,.15); color: #3ddc84; }
+  .answer-badge.web { background: rgba(69,190,210,.16); color: #39b8cf; }
+  .answer-badge.general_knowledge { background: rgba(240,184,76,.16); color: #d99a26; }
+  .answer-badge.declined { background: rgba(255,107,107,.15); color: #ff6b6b; }
+  .answer-badge.calculation { background: rgba(167,139,250,.15); color: #a78bfa; }
+  .agent-debug { font-size: .76rem; color: var(--text-muted); }
+  .agent-debug pre { white-space: pre-wrap; max-width: 620px; background: var(--bg-3);
+    padding: .65rem; border-radius: var(--radius-sm); }
+  .agent-source { display: block; font-size: .78rem; color: var(--accent); margin-top: .25rem; }
+  .answer-images { display: grid; gap: .7rem; margin: .25rem 0 .35rem; }
+  .answer-image-button { display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; text-align: left; }
+  .answer-image { display: block; max-width: 100%; height: auto; border: 1px solid #273449; border-radius: 12px; }
+  .answer-image-caption { color: var(--text-muted); font-size: .78rem; margin-top: .3rem; }
+  .chart-modal { width: min(94vw, 1100px); max-width: none; max-height: 92vh; padding: 1rem; color: var(--text); background: var(--bg-2); border: 1px solid #273449; border-radius: 14px; }
+  .chart-modal::backdrop { background: rgba(3, 7, 18, .82); }
+  .chart-modal img { display: block; max-width: 100%; max-height: 78vh; margin: 0 auto; border: 1px solid #273449; border-radius: 12px; }
+  .chart-modal p { color: var(--text-muted); margin: .65rem 0 0; }
+  .chart-modal-close { display: block; margin: 0 0 .7rem auto; padding: .45rem .75rem; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--text); background: var(--bg-3); cursor: pointer; }
 
   /* ---------- "Searching" robot, replaces a plain dots spinner ---------- */
   .bot-loader { display: flex; align-items: center; gap: .7rem; padding: .4rem 0 .3rem; }
@@ -497,13 +539,143 @@
     #composer-wrap { left: 0; }
     .thread { padding-top: 1.3rem; }
   }
+  /* Sentinel responsive visual system */
+  :root {
+    --bg: #0B1120; --card: #151F32; --hover: #1E293B; --border: #273449;
+    --text: #F8FAFC; --muted: #94A3B8; --turquoise: #2DD4BF;
+    --turquoise-dark: #14B8A6; --turquoise-light: #99F6E4;
+    --bg-2: var(--card); --bg-3: var(--hover); --bg-hover: var(--hover);
+    --border-strong: #34445F; --text-muted: var(--muted); --text-faint: var(--muted);
+    --accent: var(--turquoise); --accent-2: var(--turquoise-dark);
+    --accent-weak: rgba(45,212,191,.12); --accent-weak-2: rgba(45,212,191,.06);
+    --success: #34D399; --danger: #FB7185; --danger-weak: rgba(251,113,133,.12);
+  }
+  :root[data-theme="light"] {
+    --bg: #F6F8FC; --card: #FFFFFF; --hover: #EAF0F7; --border: #D7E0EB;
+    --text: #102033; --muted: #52657B; --turquoise: #0F8F83;
+    --turquoise-dark: #0B786F; --turquoise-light: #115E59;
+    --bg-2: var(--card); --bg-3: var(--hover); --bg-hover: var(--hover);
+    --border-strong: #B9C7D7; --text-muted: var(--muted); --text-faint: #62748A;
+    --accent: var(--turquoise); --accent-2: var(--turquoise-dark);
+    --accent-weak: rgba(15,143,131,.12); --accent-weak-2: rgba(15,143,131,.06);
+    --success: #15803D; --danger: #BE123C; --danger-weak: rgba(190,18,60,.09);
+    --shadow: 0 12px 34px rgba(16,32,51,.10);
+  }
+  html, body { min-height: 100%; width: 100%; overflow-x: hidden; }
+  body { background: var(--bg); color: var(--text); transition: none; }
+  :focus-visible { outline: 2px solid var(--turquoise-light) !important; outline-offset: 3px; }
+  .app { grid-template-columns: 284px minmax(0, 1fr); background: var(--bg); }
+  .sidebar { gap: 1rem; padding: 1rem; background: var(--bg); border-color: var(--border); }
+  .brand { padding: .25rem .25rem .75rem; border-bottom: 1px solid var(--border); }
+  .brand-icon { width: 36px; height: 36px; border-radius: 12px; background: var(--card); box-shadow: none; border: 1px solid var(--border); }
+  .brand-icon svg, .main-brand svg { color: var(--turquoise); }
+  .brand-name, .main-brand-name { color: var(--text); letter-spacing: -.025em; }
+  .brand-tagline, .main-tagline { color: var(--muted); }
+  .main { min-width: 0; background: var(--bg); }
+  .main-header { min-height: 76px; padding: .85rem clamp(1rem, 3vw, 2.3rem); background: var(--bg); border-color: var(--border); }
+  .main-brand { gap: .8rem; min-width: 0; }
+  .main-brand svg { width: 34px; height: 34px; flex: none; }
+  .main-brand-name { font-size: 1.08rem; }
+  .main-tagline { font-size: .8rem; }
+  .header-mode { width: auto; min-width: 152px; margin: 0; background: var(--card); border-color: var(--border); border-radius: 12px; }
+  .side-section { padding: .85rem; border: 1px solid var(--border); border-radius: 14px; background: var(--card); min-width: 0; }
+  .side-section h2 { color: var(--muted); margin-bottom: .7rem; }
+  .metadata-input, select.metadata-input { background: var(--bg); color: var(--text); border-color: var(--border); border-radius: 11px; }
+  .dropzone { background: var(--bg); border-color: #40516b; border-radius: 12px; color: var(--muted); }
+  .dropzone:hover, .dropzone.drag { border-color: var(--turquoise); background: rgba(45,212,191,.07); transform: none; }
+  .dropzone svg, .dropzone u { color: var(--turquoise); }
+  .status-pill, .config-details { background: var(--bg); border-color: var(--border); }
+  .config { background: var(--bg); color: var(--muted); border-color: var(--border); }
+  .config-details summary { color: var(--muted); }
+  .btn { background: var(--hover); border-color: var(--border); border-radius: 11px; }
+  .btn:hover { background: #26354c; border-color: #40516b; }
+  .thread { max-width: 900px; min-width: 0; padding: clamp(1.5rem, 4vh, 3rem) clamp(1rem, 4vw, 2.5rem) 9rem; }
+  .empty-state { padding: clamp(2rem, 8vh, 5rem) .5rem 2rem; animation: none; }
+  .empty-icon { width: 58px; height: 58px; border-radius: 16px; background: var(--card); border: 1px solid var(--border); }
+  .empty-icon svg { color: var(--turquoise); }
+  .empty-state h1 { font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.035em; }
+  .empty-state p { color: var(--muted); max-width: 620px; }
+  .example-chips { max-width: 710px; gap: .6rem; }
+  .example-chip { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: .7rem .9rem; font: .84rem var(--font); text-align: left; transition: border-color .15s ease, background .15s ease; }
+  .example-chip:hover { border-color: var(--turquoise-dark); background: var(--hover); color: var(--turquoise-light); }
+  #messages { gap: 1.2rem; }
+  .msg { gap: .75rem; animation: none; min-width: 0; }
+  .avatar { width: 32px; height: 32px; border-radius: 11px; background: var(--card); border: 1px solid var(--border); }
+  .msg.assistant .avatar { background: var(--card); border-color: var(--border); }
+  .msg.assistant .avatar svg { color: var(--turquoise); }
+  .msg.user .avatar { display: none; }
+  .msg-body { max-width: min(86%, 720px); min-width: 0; }
+  .bubble { padding: .9rem 1rem; border-radius: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+  .bubble.error-state { color: #FDA4AF; border-color: rgba(251,113,133,.5); background: rgba(127,29,29,.2); }
+  .msg.user .bubble { background: rgba(45,212,191,.09); color: var(--text); border: 1px solid rgba(45,212,191,.18); border-radius: 14px 14px 4px 14px; }
+  .msg.assistant .bubble { background: var(--card); border: 1px solid var(--border); border-radius: 4px 14px 14px; }
+  .answer-badge { border: 1px solid currentColor; letter-spacing: .045em; }
+  .answer-badge.documents { color: #4ADE80; background: rgba(74,222,128,.10); }
+  .answer-badge.web { color: #60A5FA; background: rgba(96,165,250,.11); }
+  .answer-badge.general_knowledge { color: #FBBF24; background: rgba(251,191,36,.11); }
+  .answer-badge.calculation { color: #C4B5FD; background: rgba(196,181,253,.11); }
+  .answer-badge.declined { color: #FB7185; background: rgba(251,113,133,.11); }
+  .agent-debug { border: 1px solid var(--border); border-radius: 12px; padding: .55rem .75rem; background: var(--card); }
+  .agent-debug summary { color: var(--muted); cursor: pointer; }
+  .agent-debug pre { max-width: 100%; overflow: auto; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+  .sources { background: var(--card); border-color: var(--border); border-radius: 14px; }
+  .sources summary { color: var(--text); }
+  .sources summary:hover { background: var(--hover); }
+  .sources-body { border-color: var(--border); }
+  .chip { color: var(--turquoise-light); background: rgba(45,212,191,.09); border-color: rgba(45,212,191,.16); }
+  .bar { background: var(--hover); }
+  .bar > div { background: var(--turquoise-dark); transition: none; }
+  .chunk-text, .sources-body .caption { color: var(--muted); }
+  .agent-source { color: var(--muted); overflow-wrap: anywhere; }
+  .agent-source a { color: var(--turquoise-light); }
+  .web-block { background: var(--card); border-color: var(--border); animation: none; }
+  .web-header { color: #60A5FA; border-color: var(--border); }
+  .web-source-link:hover { color: #93C5FD; }
+  .bot-3d { display: none; }
+  .bot-loader::before { content: ""; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--turquoise); border-radius: 50%; animation: sentinel-spin .9s linear infinite; }
+  @keyframes sentinel-spin { to { transform: rotate(360deg); } }
+  #composer-wrap { left: 284px; padding: .8rem clamp(1rem, 3vw, 2.3rem) 1rem; background: var(--bg); }
+  .composer { max-width: 900px; border: 1px solid var(--border); background: var(--card); border-radius: 16px; padding: .45rem .5rem .45rem 1rem; box-shadow: 0 12px 30px rgba(0,0,0,.18); }
+  .composer:focus-within { border-color: var(--turquoise-dark); }
+  #question { color: var(--text); }
+  #question::placeholder { color: var(--muted); }
+  #send { width: 40px; height: 40px; border-radius: 12px; background: var(--turquoise); color: #0B1120; transition: background .15s ease, opacity .15s ease; }
+  #send:hover:not(:disabled) { transform: none; background: var(--turquoise-light); }
+  #send:active:not(:disabled) { transform: none; }
+  .safety-footer { color: var(--muted); background: var(--bg); }
+  .menu-toggle { display: none; border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 10px; width: 40px; height: 40px; align-items: center; justify-content: center; cursor: pointer; flex: none; }
+  .menu-toggle svg { width: 19px; height: 19px; }
+  .mascot.empty-icon { display: flex; flex: none; min-height: 0; width: 74px; height: 74px; margin: 0 auto 1.1rem; cursor: pointer; }
+  .mascot.empty-icon .mascot-3d { transform: scale(.45); }
+  .mascot.empty-icon .mascot-speech { bottom: calc(100% + 8px); }
+  @media (max-width: 900px) { .app { grid-template-columns: 250px minmax(0, 1fr); } #composer-wrap { left: 250px; } }
+  @media (max-width: 680px) {
+    .app { display: flex; flex-direction: column; min-height: 100dvh; }
+    .main { min-height: 100dvh; }
+    .sidebar { display: none; position: fixed; inset: 0 18% 0 0; z-index: 20; overflow-y: auto; border: 1px solid var(--border); border-radius: 0 16px 16px 0; box-shadow: 14px 0 38px rgba(0,0,0,.38); }
+    .sidebar.is-open { display: flex; }
+  .sidebar .side-section, .sidebar .hint, .sidebar .btn.ghost { display: block; }
+    .main-header { gap: .7rem; min-height: 72px; padding: .7rem .85rem; }
+    .menu-toggle { display: inline-flex; }
+    .main-brand { flex: 1; gap: .55rem; }
+    .main-brand svg { width: 28px; height: 28px; }
+    .main-tagline { font-size: .68rem; }
+    .header-mode { min-width: 104px; width: 104px; font-size: .76rem !important; padding: .5rem .35rem !important; }
+    .thread { padding: 1.2rem .9rem 8rem; }
+    .msg-body, .msg.user .msg-body { max-width: 94%; }
+    #composer-wrap { left: 0; padding: .6rem .7rem calc(.7rem + env(safe-area-inset-bottom)); }
+    .composer { border-radius: 14px; }
+    .safety-footer { padding-bottom: .4rem; font-size: .66rem; }
+  }
+  @media (max-width: 380px) { .main-tagline { max-width: 165px; } .header-mode { min-width: 92px; width: 92px; } .example-chip { width: 100%; text-align: center; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 </style>
 
 <div class="app">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="brand">
       <span class="brand-icon" id="brand-icon"></span>
-      <span class="brand-name">Ask your PDF</span>
+      <span class="brand-copy"><span class="brand-name">Sentinel</span><span class="brand-tagline">Your AI assistant for understanding ADAS</span></span>
       <button class="icon-btn" id="theme-toggle" title="Toggle theme" type="button"></button>
     </div>
 
@@ -514,6 +686,14 @@
         <span id="dropzone-text">Drop a PDF or <u>browse</u></span>
       </label>
       <input id="file" type="file" accept="application/pdf" class="sr-only">
+      <input id="doc-system" class="metadata-input" placeholder="System label (e.g. AEB, ACC)">
+      <select id="source-type" class="metadata-input" aria-label="Source type">
+        <option value="reference">Reference document</option>
+        <option value="safety_standard">Safety standard</option>
+        <option value="owners_manual">Owner's manual</option>
+        <option value="research">Research / evaluation</option>
+      </select>
+      <input id="car-model" class="metadata-input" placeholder="Car model (optional)">
     </section>
 
     <section class="side-section">
@@ -544,35 +724,41 @@
 
     <button class="btn ghost" id="clear" type="button"></button>
 
-    <div class="mascot" id="mascot" title="Idle">
-      <div class="mascot-3d">
-        <div class="mascot-speech" id="mascot-speech"></div>
-        <div class="mascot-figure">
-          <div class="mascot-antenna"><i class="mascot-antenna-dot"></i></div>
-          <div class="mascot-head">
-            <div class="mascot-eye l"></div>
-            <div class="mascot-eye r"></div>
-            <div class="mascot-mouth"></div>
-          </div>
-          <div class="mascot-neck"></div>
-          <div class="mascot-body">
-            <div class="mascot-arm l"></div>
-            <div class="mascot-arm r"></div>
-            <div class="mascot-core"></div>
-          </div>
-        </div>
-        <div class="mascot-shadow"></div>
-      </div>
-    </div>
   </aside>
 
   <main class="main">
+    <header class="main-header">
+      <button id="mobile-menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Open sidebar menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="main-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>
+        <div class="main-brand-copy"><span class="main-brand-name">Sentinel</span><span class="main-tagline">Your AI assistant for understanding ADAS</span></div>
+      </div>
+      <select id="agent-mode" class="metadata-input header-mode" aria-label="Answer mode">
+        <option value="off">Document chat</option><option value="assistant">Assistant</option><option value="tutor">Tutor</option>
+      </select>
+    </header>
     <div class="thread">
       <div class="empty-state" id="empty-state">
-        <div class="empty-icon" id="empty-icon"></div>
-        <h1>Ask your PDF</h1>
-        <p>Answers come only from the document you upload. If the answer is not
-           in the text, the system says so instead of inventing one.</p>
+        <div class="empty-icon mascot" id="mascot" title="Sentinel assistant">
+          <div class="mascot-speech" id="mascot-speech"></div>
+          <div class="mascot-3d">
+            <div class="mascot-figure">
+              <div class="mascot-antenna"><i class="mascot-antenna-dot"></i></div>
+              <div class="mascot-head"><div class="mascot-eye l"></div><div class="mascot-eye r"></div><div class="mascot-mouth"></div></div>
+              <div class="mascot-neck"></div>
+              <div class="mascot-body"><div class="mascot-arm l"></div><div class="mascot-arm r"></div><div class="mascot-core"></div></div>
+            </div>
+            <div class="mascot-shadow"></div>
+          </div>
+        </div>
+        <h1>Welcome to Sentinel</h1>
+        <p>Hi, I'm Sentinel. Ask me anything about ADAS: how AEB, adaptive cruise control or lane keeping work, what the SAE levels mean, or what a warning on your dashboard is telling you.</p>
+        <div class="example-chips">
+          <button type="button" class="example-chip">How does Adaptive Cruise Control work?</button>
+          <button type="button" class="example-chip">Explain Automatic Emergency Braking.</button>
+          <button type="button" class="example-chip">What is the difference between LKA and LDW?</button>
+          <button type="button" class="example-chip">What are the SAE levels of driving automation?</button>
+        </div>
       </div>
       <div id="doc-bar" class="doc-bar" style="display:none"></div>
       <div id="messages"></div>
@@ -586,6 +772,12 @@
     <button id="send" type="submit" disabled aria-label="Send"></button>
   </form>
 </div>
+<div class="safety-footer">Sentinel assists understanding only. ADAS assists the driver and does not replace them.</div>
+<dialog class="chart-modal" id="chart-modal" aria-label="Enlarged chart">
+  <button class="chart-modal-close" id="chart-modal-close" type="button">Close</button>
+  <img id="chart-modal-image" alt="">
+  <p id="chart-modal-caption"></p>
+</dialog>
 
 <script>
 const ICONS = {
@@ -605,7 +797,7 @@ const ICONS = {
 const $ = (id) => document.getElementById(id);
 const state = {
   collection: null, filename: null, chunkCount: 0, messages: [],
-  webFallback: false,
+  webFallback: false, agentMode: "off",
   // Drive the sidebar mascot from real state rather than a fixed loop -
   // see updateMascot(). online starts true so the mascot doesn't flash
   // "offline" for a frame before the first health check resolves.
@@ -616,7 +808,7 @@ function updateMascot() {
   const el = $("mascot");
   if (!el) return;
   const mood = !state.online ? "offline" : state.busy ? "busy" : "";
-  el.className = "mascot" + (mood ? " " + mood : "");
+  el.className = "empty-icon mascot" + (mood ? " " + mood : "");
   el.title = !state.online ? "Ollama unreachable" : state.busy ? "Working on it…" : "Idle";
 }
 
@@ -664,7 +856,7 @@ const REFUSAL_MARKERS = ["does not contain", "not contain this information",
   "no information", "not mentioned", "cannot answer"];
 const looksLikeRefusal = (text) => REFUSAL_MARKERS.some((m) => text.toLowerCase().includes(m));
 
-const GREETINGS = ["Hi there.", "What can I help with?", "Ready when you are.",
+const GREETINGS = ["Hi, I'm Sentinel.", "What can I help with?", "Ready when you are.",
   "Need something?", "I'm listening.", "What's up?"];
 const IDLE_LINES = ["Here if you need me.", "Take your time.", "Still here.",
   "Whenever you're ready.", "Just waiting."];
@@ -696,6 +888,17 @@ setInterval(() => {
   }
 }, 22000);
 
+document.querySelectorAll(".example-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    $("question").value = chip.textContent;
+    if ($("question").disabled) {
+      $("agent-mode").value = "assistant";
+      $("agent-mode").dispatchEvent(new Event("change"));
+    }
+    $("form").requestSubmit();
+  });
+});
+
 // ---------------------------------------------------------------- theme ---
 function applyTheme(mode) {
   document.documentElement.setAttribute("data-theme", mode);
@@ -715,7 +918,6 @@ $("theme-toggle").addEventListener("click", () => {
 // ---------------------------------------------------------- static icons --
 $("brand-icon").innerHTML = ICONS.doc;
 $("dropzone-icon").innerHTML = ICONS.upload;
-$("empty-icon").innerHTML = ICONS.docBig;
 $("send").innerHTML = ICONS.send;
 $("clear").innerHTML = ICONS.trash + "<span>Clear conversation</span>";
 $("web-toggle-icon").innerHTML = ICONS.globe;
@@ -784,6 +986,20 @@ function applyOnlineState(online) {
 $("web-toggle").addEventListener("change", (e) => {
   state.webFallback = e.target.checked;
 });
+$("mobile-menu-toggle").addEventListener("click", () => {
+  const open = $("sidebar").classList.toggle("is-open");
+  $("mobile-menu-toggle").setAttribute("aria-expanded", String(open));
+  $("mobile-menu-toggle").setAttribute("aria-label", open ? "Close sidebar menu" : "Open sidebar menu");
+});
+$("agent-mode").addEventListener("change", (e) => {
+  state.agentMode = e.target.value;
+  const agentEnabled = state.agentMode !== "off";
+  $("question").disabled = !agentEnabled && !state.collection;
+  $("send").disabled = !agentEnabled && !state.collection;
+  $("question").placeholder = agentEnabled
+    ? (state.agentMode === "tutor" ? "Learn or quiz me on an ADAS system…" : "Ask about ADAS or vehicle safety…")
+    : "Ask about this document…";
+});
 
 // ------------------------------------------------------------- doc bar ----
 function renderDocBar() {
@@ -798,6 +1014,14 @@ function renderDocBar() {
 }
 
 // ------------------------------------------------------------- sources ----
+function pageReferenceText(item) {
+  if (item.printed_page !== null && item.printed_page !== undefined && item.printed_page !== "") {
+    return `p. ${item.printed_page}`;
+  }
+  const pdfPage = item.pdf_page ?? item.page;
+  return pdfPage !== null && pdfPage !== undefined && pdfPage !== "" ? `PDF p. ${pdfPage}` : "";
+}
+
 function scaleBar(sim) {
   // Scaled to the observed range (0.30-0.70), not 0-1 - see README /
   // BUILD_LOG: a 0-1 bar renders every real result as roughly half full
@@ -824,12 +1048,37 @@ function renderSources(hits) {
     const weak = rank === 1 ? "" : " weak";
     const row = document.createElement("div");
     row.className = "source-row";
-    row.innerHTML =
-      `<span class="chip${weak}">#${rank}</span>` +
-      `<span class="chip${weak}">chunk ${h.chunk_index}</span>` +
-      `<span class="chip${weak}">${h.similarity.toFixed(4)}</span>` +
-      `<div class="bar"><div style="width:${scaleBar(h.similarity)}%"></div></div>` +
-      `<p class="chunk-text">${h.text.slice(0, 900)}${h.text.length > 900 ? "…" : ""}</p>`;
+    const rankChip = document.createElement("span");
+    rankChip.className = `chip${weak}`;
+    rankChip.textContent = `#${rank}`;
+    const sourceChip = document.createElement("span");
+    sourceChip.className = `chip${weak}`;
+    const pageRef = pageReferenceText(h);
+    sourceChip.textContent = `${h.source || "source"}${pageRef ? ` · ${pageRef}` : ` · chunk ${h.chunk_index}`}`;
+    const neighborChip = h.neighbor ? document.createElement("span") : null;
+    if (neighborChip) {
+      neighborChip.className = "chip";
+      neighborChip.textContent = "neighbor";
+    }
+    const scoreChip = document.createElement("span");
+    scoreChip.className = `chip${weak}`;
+    const hasSimilarity = h.similarity !== null && h.similarity !== undefined
+      && Number.isFinite(Number(h.similarity));
+    scoreChip.textContent = hasSimilarity ? Number(h.similarity).toFixed(4) : "";
+    const bar = hasSimilarity ? document.createElement("div") : null;
+    if (bar) {
+      bar.className = "bar";
+      const fill = document.createElement("div");
+      fill.style.width = `${scaleBar(Number(h.similarity))}%`;
+      bar.appendChild(fill);
+    }
+    const chunkText = document.createElement("p");
+    chunkText.className = "chunk-text";
+    chunkText.textContent = h.text.slice(0, 900) + (h.text.length > 900 ? "…" : "");
+    row.append(rankChip, sourceChip);
+    if (neighborChip) row.appendChild(neighborChip);
+    if (hasSimilarity) row.append(scoreChip, bar);
+    row.appendChild(chunkText);
     body.appendChild(row);
   });
   details.appendChild(body);
@@ -849,11 +1098,98 @@ function addMessage(role, text) {
   return wrap;
 }
 
+function renderAgentSources(sources) {
+  const block = document.createElement("details");
+  block.className = "sources";
+  const heading = document.createElement("summary");
+  heading.textContent = `Sources · ${sources.length}`;
+  block.appendChild(heading);
+  sources.forEach((source) => {
+    const line = document.createElement("div");
+    line.className = "agent-source";
+    if (source.type === "web" && source.url) {
+      const link = document.createElement("a");
+      link.href = source.url; link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = `${source.title || "Web source"} · ${source.url}`;
+      line.appendChild(link);
+    } else {
+      const pageRef = pageReferenceText(source);
+      line.textContent = `${source.source || "Document"}${pageRef ? `, ${pageRef}` : ""}${source.chunk_index !== undefined ? ` · chunk ${source.chunk_index}` : ""}${source.neighbor ? " · neighbor" : ""}${source.system ? ` · ${source.system}` : ""}`;
+    }
+    block.appendChild(line);
+  });
+  return block;
+}
+
+function renderAgentDetails(body, result) {
+  const badge = document.createElement("span");
+  badge.className = `answer-badge ${result.answer_source || "general_knowledge"}`;
+  badge.textContent = (result.answer_source || "general_knowledge").replaceAll("_", " ");
+  body.appendChild(badge);
+  if (result.images && result.images.length) body.appendChild(renderAnswerImages(result.images));
+  if (result.sources && result.sources.length) body.appendChild(renderAgentSources(result.sources));
+  const details = document.createElement("details");
+  details.className = "agent-debug";
+  const summary = document.createElement("summary");
+  summary.textContent = "Tool-call trace";
+  const pre = document.createElement("pre");
+  pre.textContent = JSON.stringify(result.tool_trace || [], null, 2);
+  details.append(summary, pre);
+  body.appendChild(details);
+}
+
+function renderAnswerImages(images) {
+  const gallery = document.createElement("div");
+  gallery.className = "answer-images";
+  images.forEach((item) => {
+    if (!item || item.kind !== "chart" || !item.url) return;
+    const citation = item.source
+      ? `${item.source}${pageReferenceText(item) ? `, ${pageReferenceText(item)}` : ""}`
+      : "";
+    const captionText = [item.caption || "Sentinel chart", citation, item.source_status]
+      .filter(Boolean).join(" · ");
+    const figure = document.createElement("figure");
+    figure.style.margin = "0";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "answer-image-button";
+    button.setAttribute("aria-label", `Enlarge chart: ${captionText}`);
+    const image = document.createElement("img");
+    image.className = "answer-image";
+    image.src = item.url;
+    image.alt = captionText;
+    button.appendChild(image);
+    button.addEventListener("click", () => {
+      const modal = $("chart-modal");
+      $("chart-modal-image").src = item.url;
+      $("chart-modal-image").alt = image.alt;
+      $("chart-modal-caption").textContent = captionText;
+      modal.showModal();
+      $("chart-modal-close").focus();
+    });
+    const caption = document.createElement("figcaption");
+    caption.className = "answer-image-caption";
+    caption.textContent = captionText;
+    figure.append(button, caption);
+    gallery.appendChild(figure);
+  });
+  return gallery;
+}
+
+$("chart-modal-close").addEventListener("click", () => $("chart-modal").close());
+$("chart-modal").addEventListener("click", (event) => {
+  if (event.target === $("chart-modal")) $("chart-modal").close();
+});
+
 async function handleUpload(file) {
   $("dropzone-text").innerHTML = `<span class="fname">${file.name}</span>`;
   $("status-text").textContent = "Indexing…";
   const form = new FormData();
   form.append("pdf", file);
+  form.append("system", $("doc-system").value.trim() || "general");
+  form.append("source_type", $("source-type").value);
+  form.append("car_model", $("car-model").value.trim());
   const r = await fetch("/api/upload", { method: "POST", body: form });
   const data = await r.json();
   if (!r.ok) {
@@ -917,6 +1253,9 @@ function renderWebBlock(body) {
 }
 
 async function handleAsk(question) {
+  // Ignore repeated submits while an answer is in flight. This keeps one
+  // visible user message paired with one request and one history entry.
+  if (state.busy) return;
   addMessage("user", question);
   const assistantWrap = addMessage("assistant", "");
   const body = assistantWrap.querySelector(".msg-body");
@@ -930,10 +1269,34 @@ async function handleAsk(question) {
   state.busy = true;
   updateMascot();
   try {
-    await streamAnswer(question, body, bubble);
+    if (state.agentMode !== "off") await askAgentFromPage(question, body, bubble);
+    else await streamAnswer(question, body, bubble);
   } finally {
     state.busy = false;
     updateMascot();
+  }
+}
+
+async function askAgentFromPage(question, body, bubble) {
+  bubble.innerHTML = botLoader("Choosing tools and searching documents…");
+  const history = state.messages.slice(-6);
+  try {
+    const response = await fetch("/api/agent", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, mode: state.agentMode, history }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Agent request failed.");
+    bubble.textContent = result.answer || "No answer returned.";
+    state.messages.push({ role: "user", content: question });
+    state.messages.push({ role: "assistant", content: result.answer || "",
+      answer_source: result.answer_source, sources: result.sources || [] });
+    renderAgentDetails(body, result);
+    jump(); say("Agent finished.");
+  } catch (error) {
+    bubble.textContent = error.message || "Agent request failed.";
+    bubble.classList.add("error-state");
+    shrug();
   }
 }
 
@@ -948,6 +1311,7 @@ async function streamAnswer(question, body, bubble) {
 
   if (!r.ok || !r.body) {
     bubble.textContent = "Request failed.";
+    bubble.classList.add("error-state");
     return;
   }
 
@@ -979,6 +1343,7 @@ async function streamAnswer(question, body, bubble) {
 
       } else if (msg.type === "error") {
         bubble.textContent = msg.message;
+        bubble.classList.add("error-state");
 
       } else if (msg.type === "web_start") {
         webBlock = renderWebBlock(body);
@@ -1044,15 +1409,17 @@ $("file").addEventListener("change", (e) => {
 
 $("form").addEventListener("submit", (e) => {
   e.preventDefault();
+  if (state.busy) return;
   const input = $("question");
   const q = input.value.trim();
-  if (!q || !state.collection) return;
+  if (!q || (!state.collection && state.agentMode === "off")) return;
   input.value = "";
   handleAsk(q);
 });
 
 $("clear").addEventListener("click", () => {
   $("messages").innerHTML = "";
+  state.messages = [];
 });
 
 refreshHealth().then((online) => {

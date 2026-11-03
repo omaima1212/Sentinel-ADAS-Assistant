@@ -183,12 +183,13 @@ def sweep_header_filename(pdf_path, questions):
     # add_context_headers ourselves for the two header variants so we can
     # control include_filename, which index_pdf does not expose.
     from embed import embed_text, get_collection
-    from ingest import add_context_headers, load_and_chunk
+    from ingest import add_context_headers, load_pdf_page_chunks
 
     for coll_name, include_filename in [("exp_hdr_full", True),
                                         ("exp_hdr_struct", False)]:
-        chunks = load_and_chunk(pdf_path, chunk_size=400, overlap=50,
-                                verbose=False)
+        page_chunks = load_pdf_page_chunks(pdf_path, chunk_size=400,
+                                           overlap=50, verbose=False)
+        chunks = [item["text"] for item in page_chunks]
         chunks = add_context_headers(chunks, Path(pdf_path).name,
                                      include_filename=include_filename)
         collection = get_collection(coll_name)
@@ -196,7 +197,12 @@ def sweep_header_filename(pdf_path, questions):
             ids=[f"{Path(pdf_path).stem}::{i}" for i in range(len(chunks))],
             embeddings=[embed_text(c) for c in chunks],
             documents=chunks,
-            metadatas=[{"source": Path(pdf_path).name, "chunk_index": i}
+            metadatas=[{"source": Path(pdf_path).name,
+                        "source_path": str(Path(pdf_path).resolve()),
+                        "chunk_index": i,
+                        "page": page_chunks[i]["pdf_page"],
+                        "pdf_page": page_chunks[i]["pdf_page"],
+                        "printed_page": page_chunks[i].get("printed_page") or ""}
                        for i in range(len(chunks))],
         )
 

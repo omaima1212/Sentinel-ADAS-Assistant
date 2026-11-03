@@ -16,6 +16,7 @@ import sys
 import requests
 
 from config import CHAT_MODEL, OLLAMA_URL, TOP_K
+from citations import page_reference, source_citation
 from retrieve import retrieve
 
 # The instruction block is the entire defence against hallucination.
@@ -34,6 +35,9 @@ Rules:
   "The document does not contain this information."
 - Do not guess, infer beyond the text, or fill gaps with plausible detail.
 - Quote briefly from the context to support your answer.
+- Do not write source lists or citations; the app adds page citations after the answer.
+- When the passages list periods or eras, include all of them in order with their exact dates; do not merge or skip any.
+- When the passages list periods or eras, include all of them in order with their exact dates; do not merge or skip any.
 - Never refer to "Source N", "chunk N", or any other internal label from the
   context in your answer - the reader never sees those labels, only your
   answer. Refer to the document by name if you need to attribute something.
@@ -103,7 +107,7 @@ def build_prompt(question, hits):
     context_blocks = []
     for i, hit in enumerate(hits, start=1):
         context_blocks.append(
-            f"[Passage {i} - {hit['source']}]\n"
+            f"[Passage {i} - {source_citation(hit)}]\n"
             f"{hit['text']}"
         )
     context = "\n\n---\n\n".join(context_blocks)
@@ -279,8 +283,14 @@ def answer(question, k=TOP_K, show_sources=True, web_fallback=False):
         print("=" * 70)
         for i, hit in enumerate(hits, start=1):
             preview = " ".join(hit["text"].split())[:220]
-            print(f"\n[{i}] similarity {hit['similarity']:.4f} | "
+            similarity = hit.get("similarity")
+            score_text = (f"similarity {similarity:.4f}" if similarity is not None
+                          else "neighbor")
+            print(f"\n[{i}] {score_text} | "
                   f"chunk {hit['chunk_index']} of {hit['source']}")
+            page = page_reference(hit)
+            if page:
+                print(f"    {page}")
             print(f"    {preview}...")
 
     if web_fallback and looks_like_refusal(reply):
