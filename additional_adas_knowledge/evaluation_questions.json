@@ -1,0 +1,22 @@
+[
+  {"category":"general_adas","question":"What is an ADAS system, and what role does the driver retain?"},
+  {"category":"general_adas","question":"How is driver assistance different from autonomous driving?"},
+  {"category":"general_adas","question":"What does a driver monitoring system assess?"},
+  {"category":"general_adas","question":"Why must drivers remain attentive when assistance features are active?"},
+  {"category":"adas_systems","question":"How does adaptive cruise control differ from traditional cruise control?"},
+  {"category":"adas_systems","question":"What is the purpose of automatic emergency braking?"},
+  {"category":"adas_systems","question":"How can AEB warn a driver before applying the brakes?"},
+  {"category":"adas_systems","question":"Which car-to-car collision scenarios are included in Euro NCAP's AEB testing?"},
+  {"category":"adas_systems","question":"How does lane keeping assistance differ from lane departure warning?"},
+  {"category":"adas_systems","question":"What is emergency lane keeping intended to prevent?"},
+  {"category":"sensors","question":"What are the strengths and limitations of automotive radar?"},
+  {"category":"sensors","question":"How do cameras help a vehicle detect lane markings?"},
+  {"category":"sensors","question":"What is the difference between radar and LiDAR?"},
+  {"category":"sensors","question":"What is sensor fusion in an ADAS vehicle?"},
+  {"category":"sensors","question":"How can ultrasonic sensors support parking assistance?"},
+  {"category":"limitations","question":"Can rain or fog affect an ADAS sensor's performance?"},
+  {"category":"limitations","question":"What can happen when lane markings are obscured or missing?"},
+  {"category":"limitations","question":"How should a driver respond when an assistance system reports a fault?"},
+  {"category":"driver_responsibility","question":"Who remains responsible for controlling a vehicle using driver assistance?"},
+  {"category":"driver_responsibility","question":"What should drivers know about the operating limits of their vehicle's ADAS?"}
+]

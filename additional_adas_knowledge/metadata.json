@@ -1,0 +1,20 @@
+{
+  "01_General_ADAS/Euro_NCAP_Safe_Driving_Assessment_v10.4.pdf": {
+    "document_name": "Euro NCAP Assessment Protocol – Safety Assist: Safe Driving",
+    "category": "01_General_ADAS",
+    "system": "driver monitoring and safe driving",
+    "source_type": "official_assessment_protocol",
+    "source_url": "https://cdn.euroncap.com/cars/assets/euro_ncap_assessment_protocol_sa_safe_driving_v104_3090e88253.pdf",
+    "publication_date": "2024-02",
+    "document_version": "10.4"
+  },
+  "02_ADAS_Systems/Euro_NCAP_AEB_Car_to_Car_v4.3.1.pdf": {
+    "document_name": "Euro NCAP Test Protocol – AEB Car-to-Car Systems",
+    "category": "02_ADAS_Systems",
+    "system": "AEB and forward collision warning",
+    "source_type": "official_test_protocol",
+    "source_url": "https://cdn.euroncap.com/cars/assets/euro_ncap_aeb_c2c_test_protocol_v431_532926aad1.pdf",
+    "publication_date": "2024-02",
+    "document_version": "4.3.1"
+  }
+}
