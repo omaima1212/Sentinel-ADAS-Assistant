@@ -504,7 +504,7 @@ def test_page_number_parser_uses_text_then_label_then_none():
 
 
 def test_five_eras_page_cites_printed_page_four():
-    pdf = ROOT / "data" / "2021-ADAS-Guide-Preview.pdf"
+    pdf = ROOT / "data" / "adas" / "2021-ADAS-Guide-Preview.pdf"
     page_chunk = next(item for item in load_pdf_page_chunks(pdf, verbose=False)
                       if "The Five Eras of ADAS" in item["text"])
     assert page_chunk["pdf_page"] == 5
