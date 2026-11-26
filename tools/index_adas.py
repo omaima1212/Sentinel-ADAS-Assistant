@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from config import ADAS_COLLECTION_NAME, ADAS_DATA_DIR, ADAS_METADATA_FILE
-from embed import get_collection, index_pdf
+from embed import (collection_config_status, get_collection, index_pdf)
 
 
 def index_adas_documents():
@@ -24,6 +24,12 @@ def index_adas_documents():
         raise ValueError("metadata.json must be an object keyed by PDF filename")
 
     collection = get_collection(ADAS_COLLECTION_NAME)
+    if collection_config_status(collection)["status"] != "compatible":
+        raise RuntimeError(
+            "The ADAS collection uses legacy or incompatible index settings. "
+            "Run `python tools\\rebuild_adas_index.py` to rebuild all ADAS "
+            "sources before indexing incrementally."
+        )
     pdfs = sorted(ADAS_DATA_DIR.glob("*.pdf"))
     indexed, skipped, failed = [], [], []
     for pdf_path in pdfs:

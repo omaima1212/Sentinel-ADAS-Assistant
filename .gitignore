@@ -19,3 +19,4 @@ results/charts/*.png
 # Local assistant/editor tooling
 .claude/
 .agents/
+.streamlit/secrets.toml

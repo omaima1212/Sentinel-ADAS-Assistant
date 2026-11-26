@@ -291,8 +291,22 @@ def _scope_check(question, model=None, history=None):
 
 def _is_document_meta_request(question):
     lower = question.lower()
-    return (bool(re.search(r"\b(?:summary|summarize|quiz|test\s+me|document|doc|pdf|file|guide|manual|text|page|questions?)\b", lower))
-            or bool(re.search(r"\bwhat\s+(?:is|['’]s)\s+(?:it|that|this)\s+about\b", lower)))
+    if re.search(r"\b(?:quiz|test\s+me)\b", lower):
+        return True
+    if re.search(r"\bwhat\s+(?:is|['’]s)\s+(?:it|that|this)\s+about\b", lower):
+        return True
+    return bool(
+        re.search(
+            r"\b(?:summarize|summary|overview)\b.{0,40}"
+            r"\b(?:document|doc|pdf|file|guide|manual|text)\b",
+            lower,
+        )
+        or re.search(
+            r"\bwhat\s+is\s+(?:this|that|the)\s+"
+            r"(?:document|doc|pdf|file|guide|manual|text)\s+about\b",
+            lower,
+        )
+    )
 
 
 def _document_overview_hits():
@@ -331,7 +345,22 @@ def _answer_from_passages(question, hits, model=None, quiz=False, overview=False
         return "NO_ANSWER"
     passages = "\n\n".join(
         f"[{source_citation(hit)}] {hit['text']}" for hit in hits)
-    task_rules = "Answer the user's question directly from these passages."
+    task_rules = (
+        "Answer the user's question directly from these passages. Use the "
+        "narrowest passage that directly answers it. For a definition or "
+        "'what does it do' question, explain the system's stated action, not "
+        "an effectiveness statistic. Never transfer a statistic or behavior "
+        "from a different system or variant. Include a number only when the "
+        "passage explicitly links it to the system asked about; omit unrelated "
+        "or ambiguous figures. If no passage directly answers the question, "
+        "reply exactly NO_ANSWER. Treat the passages as complete evidence, "
+        "not background. Every factual claim must be directly supported by a "
+        "supplied passage; do not fill gaps with common knowledge. If a passage "
+        "discusses a named variant rather than the exact system asked about, "
+        "identify that variant. If the passages support only part of the "
+        "explanation, state what they support and clearly say what they do "
+        "not specify."
+    )
     if quiz:
         task_rules = (
             "Create exactly 3 multiple-choice questions using only these passages. "

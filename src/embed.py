@@ -1,4 +1,4 @@
-"""
+r"""
 Day 3 - Stage 2 of the pipeline: chunks -> vectors -> ChromaDB.
 
 Run it to index a PDF:
@@ -14,10 +14,86 @@ from pathlib import Path
 import chromadb
 import requests
 
-from config import CHROMA_DIR, EMBED_MODEL, OLLAMA_URL
+from config import (CHROMA_DIR, CHUNK_OVERLAP, CHUNK_SIZE,
+                    EMBED_MODEL, HEADER_INCLUDE_FILENAME, OLLAMA_URL,
+                    USE_CONTEXT_HEADERS)
 from ingest import load_and_chunk, load_pdf_page_chunks
 
 COLLECTION_NAME = "documents"
+
+
+def index_config_metadata(chunk_size=None, overlap=None, headers=None,
+                          header_include_filename=None,
+                          embedding_model=None):
+    """Describe the settings that affect vectors stored in a collection."""
+    return {
+        "hnsw:space": "cosine",
+        "index_schema": "sentinel-rag-v1",
+        "embedding_model": embedding_model or EMBED_MODEL,
+        "chunk_size": str(chunk_size if chunk_size is not None else CHUNK_SIZE),
+        "chunk_overlap": str(overlap if overlap is not None else CHUNK_OVERLAP),
+        "context_headers": str(headers if headers is not None else USE_CONTEXT_HEADERS).lower(),
+        "header_include_filename": str(
+            header_include_filename
+            if header_include_filename is not None
+            else HEADER_INCLUDE_FILENAME
+        ).lower(),
+    }
+
+
+def collection_config_status(collection, chunk_size=None, overlap=None,
+                             headers=None, header_include_filename=None,
+                             embedding_model=None):
+    """Compare persisted collection metadata with the active configuration."""
+    metadata = getattr(collection, "metadata", None) or {}
+    if not metadata:
+        return {"status": "missing", "stored": {}, "expected": index_config_metadata(
+            chunk_size, overlap, headers, header_include_filename, embedding_model
+        )}
+
+    expected = index_config_metadata(
+        chunk_size, overlap, headers, header_include_filename, embedding_model
+    )
+    mismatches = {}
+    for key in ("embedding_model", "chunk_size", "chunk_overlap",
+                "context_headers", "header_include_filename"):
+        stored = str(metadata.get(key, "")).lower()
+        wanted = str(expected[key]).lower()
+        if not stored:
+            mismatches[key] = {"stored": None, "expected": wanted}
+        elif stored != wanted:
+            mismatches[key] = {"stored": stored, "expected": wanted}
+    if mismatches:
+        return {"status": "incompatible", "stored": metadata, "expected": expected,
+                "mismatches": mismatches}
+    return {"status": "compatible", "stored": metadata, "expected": expected}
+
+
+def set_collection_config(collection, chunk_size=None, overlap=None,
+                          headers=None, header_include_filename=None,
+                          embedding_model=None):
+    """Persist the active index settings after a successful indexing pass."""
+    metadata = index_config_metadata(
+        chunk_size, overlap, headers, header_include_filename, embedding_model
+    )
+    metadata.pop("hnsw:space")
+    existing = getattr(collection, "metadata", None) or {}
+    metadata = {
+        **{key: value for key, value in existing.items()
+           if key != "hnsw:space"},
+        **metadata,
+    }
+    if hasattr(collection, "modify"):
+        collection.modify(metadata=metadata)
+
+
+def incompatible_collection_error(status, collection_name):
+    mismatches = ", ".join(status.get("mismatches", {}))
+    return RuntimeError(
+        f"Collection '{collection_name}' has an incompatible index "
+        f"(mismatches: {mismatches or 'missing index metadata'}). "
+        "Rebuild the collection after changing embedding or chunking settings."
+    )
 
 
 def embed_text(text):
@@ -55,7 +131,9 @@ def embed_text(text):
     return response.json()["embedding"]
 
 
-def get_collection(name=COLLECTION_NAME):
+def get_collection(name=COLLECTION_NAME, chunk_size=None, overlap=None,
+                   headers=None, header_include_filename=None,
+                   embedding_model=None):
     """Open (or create) a persistent ChromaDB collection.
 
     The name is a parameter so Day 5 can build several collections with
@@ -74,7 +152,10 @@ def get_collection(name=COLLECTION_NAME):
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
     return client.get_or_create_collection(
         name=name,
-        metadata={"hnsw:space": "cosine"},
+        metadata=index_config_metadata(
+            chunk_size, overlap, headers, header_include_filename,
+            embedding_model
+        ),
     )
 
 
@@ -92,7 +173,7 @@ def has_page_metadata(collection):
 def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
               chunk_size=None, overlap=None, headers=None, verbose=True,
               system="general", source_type="reference", car_model="",
-              source_hash="", document_id=None):
+              source_hash="", document_id=None, mark_collection_config=False):
     """Full indexing pipeline: PDF -> chunks -> vectors -> stored in Chroma."""
     from config import (CHUNK_OVERLAP, CHUNK_SIZE, HEADER_INCLUDE_FILENAME,
                        USE_CONTEXT_HEADERS)
@@ -117,7 +198,14 @@ def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
             print("  -> context headers added; first chunk now begins:")
             print(f"     {chunks[0].splitlines()[0]}")
 
-    collection = get_collection(collection_name)
+    collection = get_collection(
+        collection_name,
+        chunk_size=chunk_size,
+        overlap=overlap,
+        headers=headers,
+        header_include_filename=HEADER_INCLUDE_FILENAME,
+        embedding_model=EMBED_MODEL,
+    )
 
     old = collection.get(where={"source": pdf_path.name},
                          include=["metadatas"])
@@ -132,7 +220,13 @@ def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
         # entries instead of creating duplicate copies. Duplicate chunks are a
         # nasty bug - they crowd out genuinely different results in top-k.
         ids.append(f"{doc_id}::{i}")
-        vectors.append(embed_text(chunk))
+        try:
+            vectors.append(embed_text(chunk))
+        except RuntimeError as exc:
+            raise RuntimeError(
+                f"Embedding failed for {pdf_path.name}, chunk {i + 1}/"
+                f"{len(chunks)} on PDF page {page_chunks[i]['pdf_page']}: {exc}"
+            ) from exc
         metadatas.append({"source": pdf_path.name,
                           "source_path": str(pdf_path.resolve()),
                           "chunk_index": i,
@@ -158,6 +252,21 @@ def index_pdf(pdf_path, collection_name=COLLECTION_NAME,
     stale_ids = old_ids.difference(ids)
     if stale_ids:
         collection.delete(ids=list(stale_ids))
+    if mark_collection_config:
+        records = collection.get(include=["metadatas"])
+        sources = {
+            meta.get("source") for meta in (records.get("metadatas") or [])
+            if meta and meta.get("source")
+        }
+        if sources <= {pdf_path.name}:
+            set_collection_config(
+                collection,
+                chunk_size=chunk_size,
+                overlap=overlap,
+                headers=headers,
+                header_include_filename=HEADER_INCLUDE_FILENAME,
+                embedding_model=EMBED_MODEL,
+            )
 
     if verbose:
         print(f"\nStored {len(chunks)} chunks in {CHROMA_DIR}")
@@ -214,7 +323,7 @@ def sanity_test():
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        index_pdf(sys.argv[1])
+        index_pdf(sys.argv[1], mark_collection_config=True)
         sanity_test()
     else:
         collection = get_collection()

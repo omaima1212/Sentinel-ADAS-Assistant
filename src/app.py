@@ -28,7 +28,8 @@ from config import (CHAT_MODEL, CHUNK_OVERLAP, CHUNK_SIZE, EMBED_MODEL,
                     HEADER_INCLUDE_FILENAME, OLLAMA_URL, TOP_K,
                     USE_CONTEXT_HEADERS, WEB_SEARCH_BACKEND)
 from citations import citation_line, page_reference
-from embed import embed_text, get_collection, has_page_metadata
+from embed import (collection_config_status, embed_text, get_collection,
+                   has_page_metadata, set_collection_config)
 from generate import (WEB_SYSTEM_PROMPT, ask_model_stream, build_prompt,
                       build_web_prompt, looks_like_refusal)
 from ingest import add_context_headers, load_pdf_page_chunks
@@ -100,7 +101,9 @@ def index_uploaded_pdf(file_bytes, file_name):
     collection = get_collection(collection_name)
     old = collection.get(where={"source": file_name}, include=["metadatas"])
     old_ids = set(old.get("ids") or [])
-    if collection.count() > 0 and has_page_metadata(collection):
+    config_status = collection_config_status(collection)
+    if (collection.count() > 0 and has_page_metadata(collection)
+            and config_status["status"] == "compatible"):
         return collection_name, collection.count(), True
     if old_ids:
         print(f"Re-indexing {file_name}: stored chunks lack printed_page metadata.")
@@ -139,6 +142,7 @@ def index_uploaded_pdf(file_bytes, file_name):
     stale_ids = old_ids.difference(new_ids)
     if stale_ids:
         collection.delete(ids=list(stale_ids))
+    set_collection_config(collection)
     return collection_name, len(chunks), False
 
 

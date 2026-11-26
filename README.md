@@ -70,6 +70,18 @@ python tools\index_additional_adas.py
 
 Both indexers use the configured `nomic-embed-text` model. Use the same embedding model for indexing and querying. The supplemental indexer’s document list, provenance, and indexing notes are in [additional_adas_knowledge/README.md](additional_adas_knowledge/README.md).
 
+To re-embed every primary and supplemental ADAS PDF after changing index settings, or to upgrade an older collection, run:
+
+```powershell
+python tools\rebuild_adas_index.py
+```
+
+The standalone retrieval command uses the `documents` collection by default. To query the shared ADAS collection explicitly, use:
+
+```powershell
+python src\retrieve.py --collection adas_documents "What does automatic emergency braking do?"
+```
+
 To index an individual PDF for document chat:
 
 ```powershell
@@ -95,13 +107,13 @@ Run the automated checks with:
 pytest
 ```
 
-Evaluation reports and generated charts are written under `results/`. The ADAS questions in `questions_adas.json` are placeholders; check their expected answers against the documents you use before treating the scores as an accuracy measurement.
+Evaluation reports and generated charts are written under `results/`. The ADAS questions in `questions_adas.json` are placeholders. `python src/eval_adas.py` refuses to produce an accuracy result until that file contains only verified, non-placeholder questions with correct source filenames and answers. This prevents a placeholder suite from being reported as measured accuracy.
 
 ## Configuration
 
 Project settings live in [src/config.py](src/config.py). The default web fallback backend is DuckDuckGo. DuckDuckGo may rate-limit repeated searches. The fallback can be disabled in the UI where available; ADAS agent mode may select web search when its document search is insufficient.
 
-Other notable settings include chunk size, overlap, number of retrieved passages, neighbor expansion, and optional hybrid retrieval. Changing embedding-affecting settings requires rebuilding the affected index.
+Other notable settings include chunk size, overlap, number of retrieved passages, neighbor expansion, and hybrid semantic/keyword retrieval (enabled by default). Changing embedding-affecting settings requires rebuilding the affected index.
 
 ## Project structure
 

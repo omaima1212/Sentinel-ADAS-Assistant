@@ -7,9 +7,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 import agent
+import embed
+import eval_adas
 import retrieve as retrieval
 from ingest import (extract_tables_text, load_pdf_page_chunks,
-                    parse_printed_page)
+                    parse_printed_page, clean_text)
 
 
 def test_stopping_distance_known_values():
@@ -338,6 +340,12 @@ def test_document_meta_questions_are_in_scope_and_use_spread_chunks(monkeypatch,
         assert "AEB" in result["answer"] and "ACC" in result["answer"]
 
 
+def test_specific_question_referring_to_document_uses_retrieval_not_overview():
+    question = ("According to the Euro NCAP document, how does iACC adjust "
+                "speed when the speed limit changes?")
+    assert not agent._is_document_meta_request(question)
+
+
 @pytest.mark.parametrize("question", [
     "give me a couscous recipe", "who won the World Cup",
 ])
@@ -561,3 +569,52 @@ def test_table_to_text_preserves_header_value_relationships():
     text = extract_tables_text(Page())
     assert "Model: Falcon-9X" in text
     assert "Warranty (months): 24" in text
+
+
+def test_clean_text_removes_pdf_dotted_leaders_without_joining_words():
+    cleaned = clean_text("INTRODUCTION " + "." * 140 + " 1\n\nAEB braking")
+    assert cleaned == "INTRODUCTION 1\n\nAEB braking"
+
+
+def test_collection_config_status_detects_embedding_or_chunking_mismatch():
+    class Collection:
+        metadata = embed.index_config_metadata()
+
+    assert embed.collection_config_status(Collection())["status"] == "compatible"
+
+    class MismatchedCollection:
+        metadata = {**embed.index_config_metadata(), "chunk_size": "200"}
+
+    status = embed.collection_config_status(MismatchedCollection())
+    assert status["status"] == "incompatible"
+    assert "chunk_size" in status["mismatches"]
+
+
+def test_set_collection_config_does_not_modify_chroma_distance_metric():
+    class Collection:
+        metadata = {"hnsw:space": "cosine"}
+
+        def modify(self, metadata):
+            assert "hnsw:space" not in metadata
+            self.metadata = metadata
+
+    collection = Collection()
+    embed.set_collection_config(collection)
+    assert embed.collection_config_status(collection)["status"] == "compatible"
+
+
+def test_placeholder_evaluation_set_is_refused():
+    questions = [{"placeholder": True}, {"placeholder": True}]
+    with pytest.raises(RuntimeError, match="placeholder questions"):
+        eval_adas.validate_question_set(questions)
+
+
+def test_mixed_placeholder_evaluation_set_is_refused():
+    questions = [{"placeholder": False}, {"placeholder": True}]
+    with pytest.raises(RuntimeError, match="placeholder questions"):
+        eval_adas.validate_question_set(questions)
+
+
+def test_empty_evaluation_set_is_refused():
+    with pytest.raises(RuntimeError, match="empty"):
+        eval_adas.validate_question_set([])

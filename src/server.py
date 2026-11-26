@@ -38,7 +38,8 @@ import websearch
 from config import CHAT_MODEL, CHUNK_OVERLAP, CHUNK_SIZE, EMBED_MODEL, \
     HEADER_INCLUDE_FILENAME, OLLAMA_URL, TOP_K, USE_CONTEXT_HEADERS, \
     WEB_SEARCH_BACKEND
-from embed import embed_text, get_collection, has_page_metadata
+from embed import (collection_config_status, embed_text, get_collection,
+                   has_page_metadata, set_collection_config)
 from generate import (WEB_SYSTEM_PROMPT, ask_model_stream, build_prompt,
                       build_web_prompt, looks_like_refusal)
 from ingest import add_context_headers, load_pdf_page_chunks
@@ -78,7 +79,9 @@ def index_pdf_bytes(file_bytes, file_name, system="general",
     collection_name = f"upload_{digest}"
     collection = get_collection(collection_name)
 
-    if collection.count() > 0 and has_page_metadata(collection):
+    config_status = collection_config_status(collection)
+    if (collection.count() > 0 and has_page_metadata(collection)
+            and config_status["status"] == "compatible"):
         result = (collection_name, collection.count(), True)
         _index_cache[digest] = result
         return result
@@ -125,6 +128,7 @@ def index_pdf_bytes(file_bytes, file_name, system="general",
     stale_ids = old_ids.difference(new_ids)
     if stale_ids:
         collection.delete(ids=list(stale_ids))
+    set_collection_config(collection)
     result = (collection_name, len(chunks), False)
     _index_cache[digest] = result
     return result

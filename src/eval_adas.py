@@ -110,8 +110,20 @@ def _metrics(rows, key):
             "mean_latency_seconds": sum(times) / len(times) if times else 0}
 
 
+def validate_question_set(questions):
+    if not questions:
+        raise RuntimeError("ADAS evaluation is refusing to run: the question set is empty.")
+    if any(question.get("placeholder") is True for question in questions):
+        raise RuntimeError(
+            "ADAS evaluation is refusing to run: questions_adas.json contains "
+            "placeholder questions. Replace them with verified questions, "
+            "expected answers, and source filenames before measuring accuracy."
+        )
+
+
 def run():
     questions = json.loads(QUESTION_FILE.read_text(encoding="utf-8"))
+    validate_question_set(questions)
     RESULTS_DIR.mkdir(exist_ok=True)
     collection = get_collection(ADAS_COLLECTION_NAME)
     rows = []

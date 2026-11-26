@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from config import ADAS_COLLECTION_NAME
-from embed import get_collection, index_pdf
+from embed import collection_config_status, get_collection, index_pdf
 
 DOCS_DIR = ROOT / "additional_adas_knowledge"
 METADATA_FILE = DOCS_DIR / "metadata.json"
@@ -25,6 +25,12 @@ def index_additional_documents():
         raise ValueError("additional_adas_knowledge/metadata.json must be an object")
 
     collection = get_collection(ADAS_COLLECTION_NAME)
+    if collection_config_status(collection)["status"] != "compatible":
+        raise RuntimeError(
+            "The ADAS collection uses legacy or incompatible index settings. "
+            "Run `python tools\\rebuild_adas_index.py` to rebuild all ADAS "
+            "sources before indexing incrementally."
+        )
     indexed, skipped, conflicts, failed = [], [], [], []
     for pdf_path in sorted(DOCS_DIR.rglob("*.pdf")):
         relative = pdf_path.relative_to(DOCS_DIR).as_posix()

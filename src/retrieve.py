@@ -17,7 +17,8 @@ from pathlib import Path
 from config import (ADAS_DATA_DIR, EXPAND_NEIGHBORS, HYBRID_CANDIDATE_K,
                     HYBRID_RRF_K, PROJECT_ROOT, TOP_K, USE_HYBRID)
 from citations import page_reference
-from embed import embed_text, get_collection, index_pdf
+from embed import (collection_config_status, embed_text, get_collection,
+                   incompatible_collection_error, index_pdf)
 
 
 def retrieve(question, k=TOP_K, collection_name=None, system=None,
@@ -39,6 +40,12 @@ def retrieve(question, k=TOP_K, collection_name=None, system=None,
         raise RuntimeError(
             "The collection is empty. Index a PDF first:\n"
             '    python src\\embed.py "data\\yourfile.pdf"'
+        )
+
+    status = collection_config_status(collection)
+    if status["status"] == "incompatible":
+        raise incompatible_collection_error(
+            status, collection_name or getattr(collection, "name", "documents")
         )
 
     question_vector = embed_text(question)
@@ -315,13 +322,21 @@ def print_hits(hits, preview_chars=400):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print('Usage: python src\\retrieve.py "your question here"')
+    arguments = sys.argv[1:]
+    collection_name = None
+    if arguments[:1] == ["--collection"]:
+        if len(arguments) < 3:
+            print('Usage: python src\\retrieve.py [--collection NAME] "your question here"')
+            sys.exit(1)
+        collection_name = arguments[1]
+        arguments = arguments[2:]
+    if not arguments:
+        print('Usage: python src\\retrieve.py [--collection NAME] "your question here"')
         sys.exit(1)
 
-    question = " ".join(sys.argv[1:])
+    question = " ".join(arguments)
     print(f"Question: {question}")
-    print_hits(retrieve(question))
+    print_hits(retrieve(question, collection_name=collection_name))
 
     # MEASURED on the internship logbook with nomic-embed-text (Day 5).
     # An earlier guess here said "> 0.75 = strong match". That was wrong: no

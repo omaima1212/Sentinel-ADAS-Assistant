@@ -51,6 +51,10 @@ def clean_text(text):
     """
     # Re-join words hyphenated across a line break: "informa-\ntion" -> "information"
     text = re.sub(r"-\n(\w)", r"\1", text)
+    # PDFs often encode table-of-contents leaders as one enormous token.
+    # Keeping those runs can exceed the embedding model's token limit even
+    # when the surrounding prose is a normal-sized chunk.
+    text = re.sub(r"\.{4,}", " ", text)
     # A single newline inside a paragraph is a layout artefact, not a break.
     # Two or more newlines is a real paragraph break - keep those.
     text = re.sub(r"(?<!\n)\n(?!\n)", " ", text)
